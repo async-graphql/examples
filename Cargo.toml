@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "models/starwars",
+    "models/books",
+    "models/files",
+
+    "actix-web/token-from-header",
+    "actix-web/subscription",
+    "actix-web/upload",
+    "actix-web/starwars",
+    "actix-web/error-extensions",
+
+    "federation/federation-accounts",
+    "federation/federation-products",
+    "federation/federation-reviews",
+]

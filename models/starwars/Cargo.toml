@@ -1,0 +1,9 @@
+[package]
+name = "starwars"
+version = "0.1.0"
+authors = ["sunli <scott_s829@163.com>"]
+edition = "2018"
+
+[dependencies]
+async-graphql = "1.9.0"
+slab = "0.4.2"
