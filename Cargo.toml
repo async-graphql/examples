@@ -12,6 +12,7 @@ members = [
 
     "warp/starwars",
     "warp/subscription",
+    "warp/token-from-header",
 
     "federation/federation-accounts",
     "federation/federation-products",

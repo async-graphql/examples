@@ -1,0 +1,12 @@
+[package]
+name = "warp-token-from-header"
+version = "0.1.0"
+authors = ["sunli <scott_s829@163.com>"]
+edition = "2018"
+
+[dependencies]
+async-graphql = "1.9.0"
+async-graphql-warp = "1.0.0"
+tokio = { version = "0.2", features = ["macros"] }
+warp = "0.2"
+
