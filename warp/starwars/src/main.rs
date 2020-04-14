@@ -1,8 +1,10 @@
 use async_graphql::http::{playground_source, GQLResponse};
 use async_graphql::{EmptyMutation, EmptySubscription, QueryBuilder, Schema};
+use async_graphql_warp::BadRequest;
+use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
 use std::convert::Infallible;
-use warp::{http::Response, Filter, Reply};
+use warp::{http::Response, Filter, Rejection, Reply};
 
 #[tokio::main]
 async fn main() {
@@ -25,6 +27,21 @@ async fn main() {
             .body(playground_source("/", None))
     });
 
-    let routes = graphql_post.or(graphql_playground);
+    let routes = graphql_post
+        .or(graphql_playground)
+        .recover(|err: Rejection| async move {
+            if let Some(BadRequest(err)) = err.find() {
+                return Ok::<_, Infallible>(warp::reply::with_status(
+                    err.to_string(),
+                    StatusCode::BAD_REQUEST,
+                ));
+            }
+
+            Ok(warp::reply::with_status(
+                "INTERNAL_SERVER_ERROR".to_string(),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        });
+
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }

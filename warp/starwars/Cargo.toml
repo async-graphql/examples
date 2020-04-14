@@ -10,3 +10,4 @@ async-graphql-warp = "1.0.0"
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"
 starwars = { path = "../../models/starwars" }
+http = "0.2"
