@@ -1,6 +1,6 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GQLResponse};
-use async_graphql::{EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, IntoQueryBuilderOpts, Schema};
 use async_graphql_actix_web::GQLRequest;
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 
@@ -25,7 +25,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
-            .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(web::resource("/").guard(guard::Post()).to(index).app_data(
+                IntoQueryBuilderOpts {
+                    max_num_files: Some(3),
+                    ..IntoQueryBuilderOpts::default()
+                },
+            ))
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
     .bind("127.0.0.1:8000")?
