@@ -1,0 +1,10 @@
+[package]
+name = "tide-token-from-header"
+version = "0.1.0"
+authors = ["vkill <vkill.net@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+async-graphql = "1.9.0"
+tide = "0.7"
+async-std = { version = "1.5.0", features = ["attributes"] }
