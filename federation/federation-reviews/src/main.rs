@@ -65,12 +65,12 @@ struct Query;
 #[Object]
 impl Query {
     #[entity]
-    async fn find_user_by_id<'a>(&self, id: ID) -> User {
+    async fn find_user_by_id(&self, id: ID) -> User {
         User { id }
     }
 
     #[entity]
-    async fn find_product_by_upc<'a>(&self, upc: String) -> Product {
+    async fn find_product_by_upc(&self, upc: String) -> Product {
         Product { upc }
     }
 }
