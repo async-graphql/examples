@@ -17,4 +17,7 @@ members = [
     "federation/federation-accounts",
     "federation/federation-products",
     "federation/federation-reviews",
+
+    "tide/starwars",
+    "tide/token-from-header",
 ]
