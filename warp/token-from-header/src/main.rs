@@ -23,7 +23,7 @@ struct SubscriptionRoot;
 impl SubscriptionRoot {
     #[field]
     async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
-        if ctx.data_opt::<MyToken>().map(|s| s.0.as_str()) != Some("123456") {
+        if ctx.data::<MyToken>().0 != "123456" {
             return Err("Forbidden".into());
         }
         Ok(stream::once(async move { 10 }))
@@ -60,11 +60,14 @@ async fn main() {
             struct Payload {
                 token: String,
             }
-            let mut data = Data::default();
+
             if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                let mut data = Data::default();
                 data.insert(MyToken(payload.token));
+                Ok(data)
+            } else {
+                Err("Token is required".into())
             }
-            data
         }))
         .or(graphql_playground);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;

@@ -2,7 +2,7 @@ use async_graphql::http::{playground_source, GQLRequest, GQLResponse};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, IntoQueryBuilder, Schema};
 use tide::{http_types, IntoResponse, Request, Response};
 
-struct MyToken(Option<String>);
+struct MyToken(String);
 
 struct QueryRoot;
 
@@ -10,7 +10,7 @@ struct QueryRoot;
 impl QueryRoot {
     #[field]
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
-        ctx.data::<MyToken>().0.as_deref()
+        ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
     }
 }
 
@@ -24,19 +24,21 @@ async fn graphql_post(mut req: Request<ServerState>) -> Result<Response, http_ty
         .await
         .map_err(|e| http_types::Error::new(http_types::StatusCode::BadRequest, e))?;
 
-    let query_builder = gql_request
+    let mut query_builder = gql_request
         .into_query_builder()
         .await
         .map_err(|e| http_types::Error::new(http_types::StatusCode::BadRequest, e))?;
 
     let schema = &req.state().schema;
 
-    let token = req
+    if let Some(token) = req
         .header(&"token".parse().unwrap())
-        .map(|values| values.first().map(|value| value.as_str().to_string()))
-        .unwrap_or(Some("".to_string()));
+        .and_then(|values| values.first().map(|value| value.to_string()))
+    {
+        query_builder = query_builder.data(MyToken(token));
+    }
 
-    let query_response = query_builder.data(MyToken(token)).execute(&schema).await;
+    let query_response = query_builder.execute(&schema).await;
 
     let gql_response = GQLResponse(query_response);
 
