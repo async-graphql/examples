@@ -1,9 +1,11 @@
 use async_graphql::http::{playground_source, GQLResponse};
-use async_graphql::{Context, EmptyMutation, EmptySubscription, QueryBuilder, Schema};
+use async_graphql::{Context, Data, EmptyMutation, FieldResult, QueryBuilder, Schema};
+use async_graphql_warp::graphql_subscription_with_data;
+use futures::{stream, Stream};
 use std::convert::Infallible;
 use warp::{http::Response, Filter, Reply};
 
-struct MyToken(Option<String>);
+struct MyToken(String);
 
 struct QueryRoot;
 
@@ -11,29 +13,59 @@ struct QueryRoot;
 impl QueryRoot {
     #[field]
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
-        ctx.data::<MyToken>().0.as_deref()
+        ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
+    }
+}
+
+struct SubscriptionRoot;
+
+#[async_graphql::Subscription]
+impl SubscriptionRoot {
+    #[field]
+    async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
+        if ctx.data_opt::<MyToken>().map(|s| s.0.as_str()) != Some("123456") {
+            return Err("Forbidden".into());
+        }
+        Ok(stream::once(async move { 10 }))
     }
 }
 
 #[tokio::main]
 async fn main() {
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(QueryRoot, EmptyMutation, SubscriptionRoot).finish();
 
     println!("Playground: http://localhost:8000");
 
     let graphql_post = warp::header::optional::<String>("token")
-        .and(async_graphql_warp::graphql(schema))
-        .and_then(|token, (schema, builder): (_, QueryBuilder)| async move {
-            let resp = builder.data(MyToken(token)).execute(&schema).await;
-            Ok::<_, Infallible>(warp::reply::json(&GQLResponse(resp)).into_response())
-        });
+        .and(async_graphql_warp::graphql(schema.clone()))
+        .and_then(
+            |token, (schema, mut builder): (_, QueryBuilder)| async move {
+                if let Some(token) = token {
+                    builder = builder.data(MyToken(token));
+                }
+                let resp = builder.execute(&schema).await;
+                Ok::<_, Infallible>(warp::reply::json(&GQLResponse(resp)).into_response())
+            },
+        );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         Response::builder()
             .header("content-type", "text/html")
-            .body(playground_source("/", None))
+            .body(playground_source("/", Some("/")))
     });
 
-    let routes = graphql_post.or(graphql_playground);
+    let routes = graphql_post
+        .or(graphql_subscription_with_data(schema, |value| {
+            #[derive(serde_derive::Deserialize)]
+            struct Payload {
+                token: String,
+            }
+            let mut data = Data::default();
+            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                data.insert(MyToken(payload.token));
+            }
+            data
+        }))
+        .or(graphql_playground);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }

@@ -1,11 +1,13 @@
-use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
+use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GQLResponse};
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema};
-use async_graphql_actix_web::GQLRequest;
+use async_graphql::{Context, Data, EmptyMutation, FieldResult, Schema};
+use async_graphql_actix_web::{GQLRequest, WSSubscription};
+use futures::{stream, Stream};
 
-type MySchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
+type MySchema = Schema<QueryRoot, EmptyMutation, SubscriptionRoot>;
 
-struct MyToken(Option<String>);
+struct MyToken(String);
 
 struct QueryRoot;
 
@@ -13,7 +15,20 @@ struct QueryRoot;
 impl QueryRoot {
     #[field]
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
-        ctx.data::<MyToken>().0.as_deref()
+        ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
+    }
+}
+
+struct SubscriptionRoot;
+
+#[async_graphql::Subscription]
+impl SubscriptionRoot {
+    #[field]
+    async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
+        if ctx.data_opt::<MyToken>().map(|s| s.0.as_str()) != Some("123456") {
+            return Err("Forbidden".into());
+        }
+        Ok(stream::once(async move { 10 }))
     }
 }
 
@@ -22,26 +37,49 @@ async fn index(
     req: HttpRequest,
     gql_request: GQLRequest,
 ) -> web::Json<GQLResponse> {
-    let token = MyToken(
-        req.headers()
-            .get("Token")
-            .and_then(|value| value.to_str().map(ToString::to_string).ok()),
-    );
-
-    web::Json(GQLResponse(
-        gql_request.into_inner().data(token).execute(&schema).await,
-    ))
+    let token = req
+        .headers()
+        .get("Token")
+        .and_then(|value| value.to_str().map(|s| MyToken(s.to_string())).ok());
+    let mut query = gql_request.into_inner();
+    if let Some(token) = token {
+        query = query.data(token);
+    }
+    web::Json(GQLResponse(query.execute(&schema).await))
 }
 
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source("/", None))
+        .body(playground_source("/", Some("/")))
+}
+
+async fn index_ws(
+    schema: web::Data<MySchema>,
+    req: HttpRequest,
+    payload: web::Payload,
+) -> Result<HttpResponse> {
+    ws::start_with_protocols(
+        WSSubscription::new(&schema).init_context_data(|value| {
+            #[derive(serde_derive::Deserialize)]
+            struct Payload {
+                token: String,
+            }
+            let mut data = Data::default();
+            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                data.insert(MyToken(payload.token));
+            }
+            data
+        }),
+        &["graphql-ws"],
+        &req,
+        payload,
+    )
 }
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let schema = Schema::new(QueryRoot, EmptyMutation, EmptySubscription);
+    let schema = Schema::new(QueryRoot, EmptyMutation, SubscriptionRoot);
 
     println!("Playground: http://localhost:8000");
 
@@ -49,6 +87,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(schema.clone())
             .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(
+                web::resource("/")
+                    .guard(guard::Get())
+                    .guard(guard::Header("upgrade", "websocket"))
+                    .to(index_ws),
+            )
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
     .bind("127.0.0.1:8000")?
