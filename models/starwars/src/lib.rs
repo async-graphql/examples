@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 mod model;
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
@@ -26,6 +28,7 @@ pub struct StarWars {
 }
 
 impl StarWars {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut chars = Slab::new();
 

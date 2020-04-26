@@ -107,7 +107,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         #[arg(desc = "id of the human")] id: String,
     ) -> Option<Human> {
-        ctx.data::<StarWars>().human(&id).map(|id| Human(id))
+        ctx.data::<StarWars>().human(&id).map(Human)
     }
 
     #[field]
@@ -123,7 +123,7 @@ impl QueryRoot {
             .data::<StarWars>()
             .humans()
             .iter()
-            .map(|id| *id)
+            .copied()
             .collect::<Vec<_>>();
         humans
             .as_slice()
@@ -138,7 +138,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         #[arg(desc = "id of the droid")] id: String,
     ) -> Option<Droid> {
-        ctx.data::<StarWars>().droid(&id).map(|id| Droid(id))
+        ctx.data::<StarWars>().droid(&id).map(Droid)
     }
 
     #[field]
@@ -154,7 +154,7 @@ impl QueryRoot {
             .data::<StarWars>()
             .droids()
             .iter()
-            .map(|id| *id)
+            .copied()
             .collect::<Vec<_>>();
         droids
             .as_slice()

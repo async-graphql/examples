@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 use async_graphql::http::{playground_source, GQLResponse};
 use async_graphql::{Context, Data, EmptyMutation, FieldResult, QueryBuilder, Schema};
 use async_graphql_warp::graphql_subscription_with_data;

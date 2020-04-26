@@ -67,27 +67,27 @@ impl QueryRoot {
     // Using our own types we can implement some base extensions
     #[field]
     async fn extend(&self) -> FieldResult<i32> {
-        Err(MyError::NotFound.extend())?
+        Err(MyError::NotFound.extend())
     }
 
     // Or on the result
     #[field]
     async fn extend_result(&self) -> FieldResult<i32> {
-        Err(MyError::NotFound).extend()?
+        Err(MyError::NotFound).extend()
     }
 
     // Base extensions can be further extended
     #[field]
     async fn more_extensions(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
-        Err(MyError::NotFound.extend_with(|_e| json!({"reason": "my reason"})))?
+        Err(MyError::NotFound.extend_with(|_e| json!({"reason": "my reason"})))
     }
 
     // works with results as well
     #[field]
     async fn more_extensions_on_result(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
-        Err(MyError::NotFound).extend_err(|_e| json!({"reason": "my reason"}))?
+        Err(MyError::NotFound).extend_err(|_e| json!({"reason": "my reason"}))
     }
 
     // extend_with is chainable
@@ -97,13 +97,13 @@ impl QueryRoot {
             .extend_with(|_| json!({"ext1": 1}))
             .extend_with(|_| json!({"ext2": 2}))
             .extend_with(|_| json!({"ext3": 3}));
-        Err(err)?
+        Err(err)
     }
 
     // extend_with overwrites keys which are already present
     #[field]
     async fn overwrite(&self) -> FieldResult<String> {
-        Err(MyError::NotFound.extend_with(|_| json!({"code": "overwritten"})))?
+        Err(MyError::NotFound.extend_with(|_| json!({"code": "overwritten"})))
     }
 }
 

@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 use async_graphql::http::{playground_source, GQLRequest, GQLResponse};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, IntoQueryBuilder, Schema};
 use tide::{Request, Response, StatusCode};

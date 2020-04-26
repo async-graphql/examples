@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GQLResponse};
