@@ -10,13 +10,8 @@ use warp::{Filter, Reply};
 
 #[SimpleObject]
 struct Product {
-    #[field]
     upc: String,
-
-    #[field]
     name: String,
-
-    #[field]
     price: i32,
 }
 
@@ -24,7 +19,6 @@ struct Query;
 
 #[Object(extends)]
 impl Query {
-    #[field]
     async fn top_products<'a>(&self, ctx: &'a Context<'_>) -> &'a Vec<Product> {
         ctx.data::<Vec<Product>>()
     }

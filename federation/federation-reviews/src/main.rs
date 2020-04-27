@@ -19,7 +19,6 @@ impl User {
         &self.id
     }
 
-    #[field]
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
         let reviews = ctx.data::<Vec<Review>>();
         reviews
@@ -40,7 +39,6 @@ impl Product {
         &self.upc
     }
 
-    #[field]
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
         let reviews = ctx.data::<Vec<Review>>();
         reviews

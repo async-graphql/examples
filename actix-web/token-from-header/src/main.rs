@@ -15,7 +15,6 @@ struct QueryRoot;
 
 #[async_graphql::Object]
 impl QueryRoot {
-    #[field]
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
     }
@@ -25,7 +24,6 @@ struct SubscriptionRoot;
 
 #[async_graphql::Subscription]
 impl SubscriptionRoot {
-    #[field]
     async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
         if ctx.data::<MyToken>().0 != "123456" {
             return Err("Forbidden".into());

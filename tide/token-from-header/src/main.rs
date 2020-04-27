@@ -10,7 +10,6 @@ struct QueryRoot;
 
 #[async_graphql::Object]
 impl QueryRoot {
-    #[field]
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
     }

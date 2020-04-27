@@ -8,10 +8,7 @@ use warp::{Filter, Reply};
 
 #[SimpleObject]
 struct User {
-    #[field]
     id: ID,
-
-    #[field]
     username: String,
 }
 
@@ -19,7 +16,6 @@ struct Query;
 
 #[Object(extends)]
 impl Query {
-    #[field]
     async fn me(&self) -> User {
         User {
             id: "1234".into(),

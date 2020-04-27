@@ -43,13 +43,11 @@ struct QueryRoot;
 #[Object]
 impl QueryRoot {
     // It works on foreign types without extensions as before
-    #[field]
     async fn parse_without_extensions(&self) -> FieldResult<i32> {
         Ok("234a".parse()?)
     }
 
     // Foreign types can be extended
-    #[field]
     async fn parse_with_extensions(&self) -> FieldResult<i32> {
         Ok("234a"
             .parse()
@@ -59,39 +57,33 @@ impl QueryRoot {
     // THIS does unfortunately NOT work because ErrorExtensions is implemented for &E and not E.
     // Which is necessary for the overwrite by the user.
 
-    //#[field]
     // async fn parse_with_extensions_result(&self) -> FieldResult<i32> {
     //    Ok("234a".parse().extend_err(|_| json!({"code": 404}))?)
     // }
 
     // Using our own types we can implement some base extensions
-    #[field]
     async fn extend(&self) -> FieldResult<i32> {
         Err(MyError::NotFound.extend())
     }
 
     // Or on the result
-    #[field]
     async fn extend_result(&self) -> FieldResult<i32> {
         Err(MyError::NotFound).extend()
     }
 
     // Base extensions can be further extended
-    #[field]
     async fn more_extensions(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
         Err(MyError::NotFound.extend_with(|_e| json!({"reason": "my reason"})))
     }
 
     // works with results as well
-    #[field]
     async fn more_extensions_on_result(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
         Err(MyError::NotFound).extend_err(|_e| json!({"reason": "my reason"}))
     }
 
     // extend_with is chainable
-    #[field]
     async fn chainable_extensions(&self) -> FieldResult<String> {
         let err = MyError::NotFound
             .extend_with(|_| json!({"ext1": 1}))
@@ -101,7 +93,6 @@ impl QueryRoot {
     }
 
     // extend_with overwrites keys which are already present
-    #[field]
     async fn overwrite(&self) -> FieldResult<String> {
         Err(MyError::NotFound.extend_with(|_| json!({"code": "overwritten"})))
     }

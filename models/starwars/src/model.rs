@@ -85,7 +85,6 @@ pub struct QueryRoot;
 
 #[async_graphql::Object]
 impl QueryRoot {
-    #[field]
     async fn hero(
         &self,
         ctx: &Context<'_>,
@@ -101,7 +100,6 @@ impl QueryRoot {
         }
     }
 
-    #[field]
     async fn human(
         &self,
         ctx: &Context<'_>,
@@ -110,7 +108,6 @@ impl QueryRoot {
         ctx.data::<StarWars>().human(&id).map(Human)
     }
 
-    #[field]
     async fn humans(
         &self,
         ctx: &Context<'_>,
@@ -132,7 +129,6 @@ impl QueryRoot {
             .map(|connection| connection.map(|id| Human(*id)))
     }
 
-    #[field]
     async fn droid(
         &self,
         ctx: &Context<'_>,
@@ -141,7 +137,6 @@ impl QueryRoot {
         ctx.data::<StarWars>().droid(&id).map(Droid)
     }
 
-    #[field]
     async fn droids(
         &self,
         ctx: &Context<'_>,

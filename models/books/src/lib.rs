@@ -16,17 +16,14 @@ pub struct Book {
 
 #[async_graphql::Object]
 impl Book {
-    #[field]
     async fn id(&self) -> &str {
         &self.id
     }
 
-    #[field]
     async fn name(&self) -> &str {
         &self.name
     }
 
-    #[field]
     async fn author(&self) -> &str {
         &self.author
     }
@@ -38,7 +35,6 @@ pub struct QueryRoot;
 
 #[async_graphql::Object]
 impl QueryRoot {
-    #[field]
     async fn books(&self, ctx: &Context<'_>) -> Vec<Book> {
         let books = ctx.data::<Storage>().lock().await;
         books.iter().map(|(_, book)| book).cloned().collect()
@@ -49,7 +45,6 @@ pub struct MutationRoot;
 
 #[async_graphql::Object]
 impl MutationRoot {
-    #[field]
     async fn create_book(&self, ctx: &Context<'_>, name: String, author: String) -> ID {
         let mut books = ctx.data::<Storage>().lock().await;
         let entry = books.vacant_entry();
@@ -67,7 +62,6 @@ impl MutationRoot {
         id
     }
 
-    #[field]
     async fn delete_book(&self, ctx: &Context<'_>, id: ID) -> FieldResult<bool> {
         let mut books = ctx.data::<Storage>().lock().await;
         let id = id.parse::<usize>()?;
@@ -94,10 +88,7 @@ enum MutationType {
 #[async_graphql::SimpleObject]
 #[derive(Clone)]
 struct BookChanged {
-    #[field]
     mutation_type: MutationType,
-
-    #[field]
     id: ID,
 }
 
@@ -105,7 +96,6 @@ pub struct SubscriptionRoot;
 
 #[async_graphql::Subscription]
 impl SubscriptionRoot {
-    #[field]
     async fn interval(&self, #[arg(default = "1")] n: i32) -> impl Stream<Item = i32> {
         let mut value = 0;
         tokio::time::interval(Duration::from_secs(1)).map(move |_| {
@@ -114,7 +104,6 @@ impl SubscriptionRoot {
         })
     }
 
-    #[field]
     async fn books(&self, mutation_type: Option<MutationType>) -> impl Stream<Item = BookChanged> {
         SimpleBroker::<BookChanged>::subscribe().filter(move |event| {
             let res = if let Some(mutation_type) = mutation_type {
