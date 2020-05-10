@@ -1,33 +1,35 @@
 use super::StarWars;
-use async_graphql::{Connection, Context, DataSource, EmptyEdgeFields, FieldResult};
+use async_graphql::{Connection, Context, Cursor, DataSource, EmptyEdgeFields, FieldResult};
 
-#[async_graphql::Enum(desc = "One of the films in the Star Wars Trilogy")]
+/// One of the films in the Star Wars Trilogy
+#[async_graphql::Enum]
 pub enum Episode {
-    #[item(desc = "Released in 1977.")]
+    /// Released in 1977.
     NewHope,
 
-    #[item(desc = "Released in 1980.")]
+    /// Released in 1980.
     Empire,
 
-    #[item(desc = "Released in 1983.")]
+    /// Released in 1983.
     Jedi,
 }
 
 pub struct Human(usize);
 
-#[async_graphql::Object(desc = "A humanoid creature in the Star Wars universe.")]
+/// A humanoid creature in the Star Wars universe.
+#[async_graphql::Object]
 impl Human {
-    #[field(desc = "The id of the human.")]
+    /// The id of the human.
     async fn id(&self, ctx: &Context<'_>) -> &str {
         ctx.data::<StarWars>().chars[self.0].id
     }
 
-    #[field(desc = "The name of the human.")]
+    /// The name of the human.
     async fn name(&self, ctx: &Context<'_>) -> &str {
         ctx.data::<StarWars>().chars[self.0].name
     }
 
-    #[field(desc = "The friends of the human, or an empty list if they have none.")]
+    /// The friends of the human, or an empty list if they have none.
     async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
         ctx.data::<StarWars>().chars[self.0]
             .friends
@@ -36,12 +38,12 @@ impl Human {
             .collect()
     }
 
-    #[field(desc = "Which movies they appear in.")]
+    /// Which movies they appear in.
     async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
         &ctx.data::<StarWars>().chars[self.0].appears_in
     }
 
-    #[field(desc = "The home planet of the human, or null if unknown.")]
+    /// The home planet of the human, or null if unknown.
     async fn home_planet<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
         &ctx.data::<StarWars>().chars[self.0].home_planet
     }
@@ -49,19 +51,20 @@ impl Human {
 
 pub struct Droid(usize);
 
-#[async_graphql::Object(desc = "A mechanical creature in the Star Wars universe.")]
+/// A mechanical creature in the Star Wars universe.
+#[async_graphql::Object]
 impl Droid {
-    #[field(desc = "The id of the droid.")]
+    /// The id of the droid.
     async fn id(&self, ctx: &Context<'_>) -> &str {
         ctx.data::<StarWars>().chars[self.0].id
     }
 
-    #[field(desc = "The name of the droid.")]
+    /// The name of the droid.
     async fn name(&self, ctx: &Context<'_>) -> &str {
         ctx.data::<StarWars>().chars[self.0].name
     }
 
-    #[field(desc = "The friends of the droid, or an empty list if they have none.")]
+    /// The friends of the droid, or an empty list if they have none.
     async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
         ctx.data::<StarWars>().chars[self.0]
             .friends
@@ -70,12 +73,12 @@ impl Droid {
             .collect()
     }
 
-    #[field(desc = "Which movies they appear in.")]
+    /// Which movies they appear in.
     async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
         &ctx.data::<StarWars>().chars[self.0].appears_in
     }
 
-    #[field(desc = "The primary function of the droid.")]
+    /// The primary function of the droid.
     async fn primary_function<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
         &ctx.data::<StarWars>().chars[self.0].primary_function
     }
@@ -111,8 +114,8 @@ impl QueryRoot {
     async fn humans(
         &self,
         ctx: &Context<'_>,
-        after: Option<String>,
-        before: Option<String>,
+        after: Option<Cursor>,
+        before: Option<Cursor>,
         first: Option<i32>,
         last: Option<i32>,
     ) -> FieldResult<Connection<Human, EmptyEdgeFields>> {
@@ -140,8 +143,8 @@ impl QueryRoot {
     async fn droids(
         &self,
         ctx: &Context<'_>,
-        after: Option<String>,
-        before: Option<String>,
+        after: Option<Cursor>,
+        before: Option<Cursor>,
         first: Option<i32>,
         last: Option<i32>,
     ) -> FieldResult<Connection<Droid, EmptyEdgeFields>> {
