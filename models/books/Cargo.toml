@@ -5,7 +5,7 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.9.0"
+async-graphql = "1.11.0"
 slab = "0.4.2"
 tokio = { version = "0.2", features = ["time", "stream"] }
 futures = "0.3.0"

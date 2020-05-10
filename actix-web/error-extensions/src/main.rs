@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_rt;
 use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
 use async_graphql::http::{playground_source, GQLResponse};
 use async_graphql::{

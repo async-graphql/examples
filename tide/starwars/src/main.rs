@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 }
 
 async fn run() -> Result<()> {
-    let listen_addr = env::var("LISTEN_ADDR").unwrap_or("localhost:8000".to_owned());
+    let listen_addr = env::var("LISTEN_ADDR").unwrap_or_else(|_| "localhost:8000".to_owned());
 
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(StarWars::new())
