@@ -14,26 +14,12 @@ use tide::{
 };
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
+#[async_graphql::SimpleObject]
 #[derive(sqlx::FromRow, Clone)]
 pub struct Book {
     id: i32,
     name: String,
     author: String,
-}
-
-#[async_graphql::Object]
-impl Book {
-    async fn id(&self) -> &i32 {
-        &self.id
-    }
-
-    async fn name(&self) -> &str {
-        &self.name
-    }
-
-    async fn author(&self) -> &str {
-        &self.author
-    }
 }
 
 #[derive(Clone)]
