@@ -10,7 +10,6 @@ pub struct FileInfo {
     id: ID,
     filename: String,
     mimetype: Option<String>,
-    path: String,
 }
 
 pub type Storage = Mutex<Slab<FileInfo>>;
@@ -35,9 +34,8 @@ impl MutationRoot {
         let entry = storage.vacant_entry();
         let info = FileInfo {
             id: entry.key().into(),
-            filename: file.filename,
-            mimetype: file.content_type,
-            path: file.path.display().to_string(),
+            filename: file.filename().to_string(),
+            mimetype: file.content_type().map(ToString::to_string),
         };
         entry.insert(info.clone());
         info
@@ -50,9 +48,8 @@ impl MutationRoot {
             let entry = storage.vacant_entry();
             let info = FileInfo {
                 id: entry.key().into(),
-                filename: file.filename,
-                mimetype: file.content_type,
-                path: file.path.display().to_string(),
+                filename: file.filename().to_string(),
+                mimetype: file.content_type().map(ToString::to_string),
             };
             entry.insert(info.clone());
             infos.push(info)
