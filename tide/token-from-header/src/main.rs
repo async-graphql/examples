@@ -39,7 +39,7 @@ async fn run() -> Result<()> {
     let app_state = AppState { schema };
     let mut app = tide::with_state(app_state);
 
-    app.at("/").post(|req: Request<AppState>| async move {
+    async fn graphql(req: Request<AppState>) -> tide::Result<Response> {
         let schema = req.state().schema.clone();
         let token = &req
             .header(&"token".parse().unwrap())
@@ -52,10 +52,12 @@ async fn run() -> Result<()> {
             query_builder
         })
         .await
-    });
+    }
+
+    app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
         let resp = Response::new(StatusCode::Ok)
-            .body_string(playground_source("/", None))
+            .body_string(playground_source("/graphql", None))
             .set_header(headers::CONTENT_TYPE, mime::HTML.to_string());
 
         Ok(resp)
@@ -90,7 +92,7 @@ mod tests {
 
                 task::sleep(Duration::from_millis(300)).await;
 
-                let string = surf::post(format!("http://{}", listen_addr))
+                let string = surf::post(format!("http://{}/graphql", listen_addr))
                     .body_bytes(r#"{"query":"{ currentToken }"}"#)
                     .set_header("Content-Type".parse().unwrap(), "application/json")
                     .set_header("Token".parse().unwrap(), "1234")
@@ -99,7 +101,7 @@ mod tests {
 
                 assert_eq!(string, json!({"data":{"currentToken":"1234"}}).to_string());
 
-                let string = surf::post(format!("http://{}", listen_addr))
+                let string = surf::post(format!("http://{}/graphql", listen_addr))
                     .body_bytes(r#"{"query":"{ currentToken }"}"#)
                     .set_header("Content-Type".parse().unwrap(), "application/json")
                     .recv_string()

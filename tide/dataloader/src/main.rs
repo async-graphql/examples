@@ -149,13 +149,15 @@ async fn run() -> Result<()> {
     let app_state = AppState { schema };
     let mut app = tide::with_state(app_state);
 
-    app.at("/").post(|req: Request<AppState>| async move {
+    async fn graphql(req: Request<AppState>) -> tide::Result<Response> {
         let schema = req.state().schema.clone();
         async_graphql_tide::graphql(req, schema, |query_builder| query_builder).await
-    });
+    }
+
+    app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
         let resp = Response::new(StatusCode::Ok)
-            .body_string(playground_source("/", None))
+            .body_string(playground_source("/graphql", None))
             .set_header(headers::CONTENT_TYPE, mime::HTML.to_string());
 
         Ok(resp)
@@ -193,7 +195,7 @@ mod tests {
                 task::sleep(Duration::from_millis(300)).await;
 
                 //
-                let string = surf::post(format!("http://{}", listen_addr))
+                let string = surf::post(format!("http://{}/graphql", listen_addr))
                     .body_string(
                         r#"{"query":"{ book1: book(id: 1) {id, name, author} book2: book(id: 2) {id, name, author} book3: book(id: 3) {id, name, author} book4: book(id: 4) {id, name, author} }"}"#
                             .to_owned(),
@@ -219,7 +221,7 @@ mod tests {
                 assert_eq!(v["data"]["book4"], json!(null));
 
                 //
-                let string = surf::post(format!("http://{}", listen_addr))
+                let string = surf::post(format!("http://{}/graphql", listen_addr))
                     .body_string(
                         r#"{"query":"{ book1: book(id: 1) {id, name, author} book4: book(id: 4) {id, name, author} book9: book(id: 9) {id, name, author} }"}"#
                             .to_owned(),
