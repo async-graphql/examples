@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 async-graphql = "1.12.2"
-async-graphql-tide = "1.4.2"
+async-graphql-tide = "1.4.8"
 tide = "0.8"
 async-std = "1.5.0"
 dataloader = "0.12.0"
