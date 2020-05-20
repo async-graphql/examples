@@ -1,14 +1,11 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
-use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::http::playground_source;
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
-use async_graphql_actix_web::GQLRequest;
+use async_graphql_actix_web::{GQLRequest, GQLResponse};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 
-async fn index(
-    schema: web::Data<StarWarsSchema>,
-    gql_request: GQLRequest,
-) -> web::Json<GQLResponse> {
-    web::Json(GQLResponse(gql_request.into_inner().execute(&schema).await))
+async fn index(schema: web::Data<StarWarsSchema>, req: GQLRequest) -> GQLResponse {
+    req.into_inner().execute(&schema).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {

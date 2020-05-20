@@ -1,13 +1,13 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
-use async_graphql::http::{playground_source, GQLResponse};
+use actix_web::{guard, web, App, HttpResponse, HttpServer};
+use async_graphql::http::playground_source;
 use async_graphql::{
     EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
     Schema,
 };
-use async_graphql_actix_web::GQLRequest;
+use async_graphql_actix_web::{GQLRequest, GQLResponse};
 use serde_json::json;
 
 #[derive(Debug, Error)]
@@ -98,10 +98,10 @@ impl QueryRoot {
 }
 
 async fn index(
-    s: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
+    schema: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
     req: GQLRequest,
-) -> Result<web::Json<GQLResponse>> {
-    Ok(web::Json(GQLResponse(req.into_inner().execute(&s).await)))
+) -> GQLResponse {
+    req.into_inner().execute(&schema).await.into()
 }
 
 async fn gql_playgound() -> HttpResponse {

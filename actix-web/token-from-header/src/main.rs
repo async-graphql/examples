@@ -2,9 +2,9 @@
 
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
-use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::http::playground_source;
 use async_graphql::{Context, Data, EmptyMutation, FieldResult, Schema};
-use async_graphql_actix_web::{GQLRequest, WSSubscription};
+use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 use futures::{stream, Stream};
 
 type MySchema = Schema<QueryRoot, EmptyMutation, SubscriptionRoot>;
@@ -36,7 +36,7 @@ async fn index(
     schema: web::Data<MySchema>,
     req: HttpRequest,
     gql_request: GQLRequest,
-) -> web::Json<GQLResponse> {
+) -> GQLResponse {
     let token = req
         .headers()
         .get("Token")
@@ -45,7 +45,7 @@ async fn index(
     if let Some(token) = token {
         query = query.data(token);
     }
-    web::Json(GQLResponse(query.execute(&schema).await))
+    query.execute(&schema).await.into()
 }
 
 async fn gql_playgound() -> HttpResponse {

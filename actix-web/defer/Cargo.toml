@@ -1,5 +1,5 @@
 [package]
-name = "actix-web-upload"
+name = "actix-web-defer"
 version = "0.1.0"
 authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
@@ -9,4 +9,6 @@ async-graphql = "1.12.17"
 async-graphql-actix-web = "1.4.17"
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
-files = { path = "../../models/files" }
+thiserror = "1.0"
+serde_json = "1.0"
+futures = "0.3.4"

@@ -5,8 +5,8 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.12.2"
-async-graphql-actix-web = "1.4.2"
+async-graphql = "1.12.17"
+async-graphql-actix-web = "1.4.17"
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
 actix-web-actors = "2.0.0"
