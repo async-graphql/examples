@@ -7,7 +7,6 @@ use std::time::Duration;
 
 type DeferSchema = Schema<Query, EmptyMutation, EmptySubscription>;
 
-#[derive(Clone)]
 struct Comment {
     user: String,
     text: String,
