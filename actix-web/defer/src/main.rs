@@ -1,8 +1,8 @@
+use actix_cors::Cors;
 use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
 use async_graphql::http::playground_source;
-use async_graphql::{Deferred, EmptyMutation, EmptySubscription, Object, QueryResponse, Schema};
-use async_graphql_actix_web::{GQLRequest, GQLResponse, GQLResponseStream};
-use futures::Stream;
+use async_graphql::{Deferred, EmptyMutation, EmptySubscription, Object, Schema};
+use async_graphql_actix_web::{GQLRequest, GQLResponseStream};
 use std::time::Duration;
 
 type DeferSchema = Schema<Query, EmptyMutation, EmptySubscription>;
@@ -97,15 +97,8 @@ impl Query {
     }
 }
 
-async fn index_stream(
-    schema: web::Data<DeferSchema>,
-    req: GQLRequest,
-) -> GQLResponseStream<impl Stream<Item = async_graphql::Result<QueryResponse>>> {
-    GQLResponseStream::from(req.into_inner().execute_stream(&schema))
-}
-
-async fn index(schema: web::Data<DeferSchema>, req: GQLRequest) -> GQLResponse {
-    req.into_inner().execute(&schema).await.into()
+async fn index(schema: web::Data<DeferSchema>, req: GQLRequest) -> GQLResponseStream {
+    req.into_inner().execute_stream(&schema).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {
@@ -122,12 +115,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Cors::default())
             .data(schema.clone())
-            .service(
-                web::resource("/stream")
-                    .guard(guard::Post())
-                    .to(index_stream),
-            )
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(web::resource("/").guard(guard::Get()).to(index_playground))
     })
