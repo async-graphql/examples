@@ -1,9 +1,9 @@
-use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::http::playground_source;
 use async_graphql::{QueryBuilder, Schema};
-use async_graphql_warp::graphql_subscription;
+use async_graphql_warp::{graphql_subscription, GQLResponse};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use std::convert::Infallible;
-use warp::{http::Response, Filter, Reply};
+use warp::{http::Response, Filter};
 
 #[tokio::main]
 async fn main() {
@@ -16,7 +16,7 @@ async fn main() {
     let graphql_post = async_graphql_warp::graphql(schema.clone()).and_then(
         |(schema, builder): (_, QueryBuilder)| async move {
             let resp = builder.execute(&schema).await;
-            Ok::<_, Infallible>(warp::reply::json(&GQLResponse(resp)).into_response())
+            Ok::<_, Infallible>(GQLResponse::from(resp))
         },
     );
 

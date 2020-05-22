@@ -1,11 +1,11 @@
 #![allow(clippy::needless_lifetimes)]
 
-use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::http::playground_source;
 use async_graphql::{Context, Data, EmptyMutation, FieldResult, QueryBuilder, Schema};
-use async_graphql_warp::graphql_subscription_with_data;
+use async_graphql_warp::{graphql_subscription_with_data, GQLResponse};
 use futures::{stream, Stream};
 use std::convert::Infallible;
-use warp::{http::Response, Filter, Reply};
+use warp::{http::Response, Filter};
 
 struct MyToken(String);
 
@@ -44,7 +44,7 @@ async fn main() {
                     builder = builder.data(MyToken(token));
                 }
                 let resp = builder.execute(&schema).await;
-                Ok::<_, Infallible>(warp::reply::json(&GQLResponse(resp)).into_response())
+                Ok::<_, Infallible>(GQLResponse::from(resp))
             },
         );
 
