@@ -1,5 +1,6 @@
 use super::StarWars;
-use async_graphql::{Connection, Context, Cursor, DataSource, EmptyEdgeFields, FieldResult};
+use async_graphql::connection::{Connection, DataSource, EmptyFields};
+use async_graphql::{Context, FieldResult};
 
 /// One of the films in the Star Wars Trilogy
 #[async_graphql::Enum]
@@ -114,11 +115,11 @@ impl QueryRoot {
     async fn humans(
         &self,
         ctx: &Context<'_>,
-        after: Option<Cursor>,
-        before: Option<Cursor>,
+        after: Option<String>,
+        before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> FieldResult<Connection<Human, EmptyEdgeFields>> {
+    ) -> FieldResult<Connection<usize, Human, EmptyFields, EmptyFields>> {
         let humans = ctx
             .data::<StarWars>()
             .humans()
@@ -129,7 +130,7 @@ impl QueryRoot {
             .as_slice()
             .query(ctx, after, before, first, last)
             .await
-            .map(|connection| connection.map(|id| Human(*id)))
+            .map(|conn| conn.map_node(|id| Human(*id)))
     }
 
     async fn droid(
@@ -143,11 +144,11 @@ impl QueryRoot {
     async fn droids(
         &self,
         ctx: &Context<'_>,
-        after: Option<Cursor>,
-        before: Option<Cursor>,
+        after: Option<String>,
+        before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> FieldResult<Connection<Droid, EmptyEdgeFields>> {
+    ) -> FieldResult<Connection<usize, Droid, EmptyFields, EmptyFields>> {
         let droids = ctx
             .data::<StarWars>()
             .droids()
@@ -158,7 +159,7 @@ impl QueryRoot {
             .as_slice()
             .query(ctx, after, before, first, last)
             .await
-            .map(|connection| connection.map(|id| Droid(*id)))
+            .map(|conn| conn.map_node(|id| Droid(*id)))
     }
 }
 
