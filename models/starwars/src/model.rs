@@ -128,7 +128,7 @@ impl QueryRoot {
             .collect::<Vec<_>>();
         humans
             .as_slice()
-            .query(ctx, after, before, first, last)
+            .query(after, before, first, last)
             .await
             .map(|conn| conn.map_node(|id| Human(*id)))
     }
@@ -157,7 +157,7 @@ impl QueryRoot {
             .collect::<Vec<_>>();
         droids
             .as_slice()
-            .query(ctx, after, before, first, last)
+            .query(after, before, first, last)
             .await
             .map(|conn| conn.map_node(|id| Droid(*id)))
     }
