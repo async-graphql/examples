@@ -1,0 +1,10 @@
+dist
+.next
+coverage
+node_modules
+**/node_modules/**
+**/__generated__/**
+lib
+.cache
+*.bs.js
+schema.graphql
