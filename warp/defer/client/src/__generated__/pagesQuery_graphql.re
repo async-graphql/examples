@@ -8,7 +8,7 @@ module Types = {
   type response_books = {
     title: string,
     author: string,
-    comments: array(response_books_comments),
+    comments: option(array(response_books_comments)),
   };
 
   type response = {books: array(response_books)};
@@ -18,7 +18,7 @@ module Types = {
 module Internal = {
   type responseRaw;
   let responseConverter: Js.Dict.t(Js.Dict.t(Js.Dict.t(string))) = [%raw
-    {json| {} |json}
+    {json| {"__root":{"books_comments":{"n":""}}} |json}
   ];
   let responseConverterMap = ();
   let convertResponse = v =>

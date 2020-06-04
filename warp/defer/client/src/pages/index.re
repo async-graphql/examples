@@ -13,6 +13,32 @@ module Query = [%relay.query
   |}
 ];
 
+module Comments = {
+  [@react.component]
+  let make = (~comments) => {
+    Query.Types.(
+      comments
+      ->Belt.Option.getWithDefault([||])
+      ->Belt.Array.map(comment => {
+          let text = comment.text;
+          let user = comment.user;
+          <li key=text> {j|$user: $text|j}->React.string </li>;
+        })
+      ->React.array
+    );
+  };
+};
+
+module Book = {
+  [@react.component]
+  let make = (~title, ~author, ~comments) => {
+    <div>
+      <p> {j|$title by $author|j}->React.string </p>
+      <Comments comments />
+    </div>;
+  };
+};
+
 module Books = {
   [@react.component]
   let make = () => {
@@ -22,9 +48,19 @@ module Books = {
 
     <div>
       <h2
-        className="text-4xl font-extrabold tracking-tight text-gray-900 leading-10 sm:text-5xl sm:leading-none md:text-6xl">
+        className="text-4xl font-extrabold tracking-tight text-gray-900 leading-10 sm:text-5xl sm:leading-none md:text-6xl pb-10">
         {j|Streaming $booksCount books....|j}->React.string
       </h2>
+      {response.books
+       ->Belt.Array.map(book =>
+           <Book
+             key={book.title}
+             title={book.title}
+             author={book.author}
+             comments={book.comments}
+           />
+         )
+       ->React.array}
     </div>;
   };
 };

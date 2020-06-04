@@ -40,8 +40,8 @@ impl Book {
         &self.author
     }
 
-    async fn comments(&self) -> Deferred<Vec<Comment>> {
-        if self.id == 1 {
+    async fn comments(&self) -> Deferred<Option<Vec<Comment>>> {
+        let comments = if self.id == 1 {
             vec![
                 Comment {
                     user: "John".to_string(),
@@ -52,7 +52,6 @@ impl Book {
                     text: "It is a book".to_string(),
                 },
             ]
-            .into()
         } else if self.id == 2 {
             vec![
                 Comment {
@@ -64,10 +63,11 @@ impl Book {
                     text: "Excellent".to_string(),
                 },
             ]
-            .into()
         } else {
-            Vec::new().into()
-        }
+            Vec::new()
+        };
+
+        Some(comments).into()
     }
 }
 

@@ -4,7 +4,7 @@ import * as ReasonRelay from "reason-relay/src/ReasonRelay.bs.js";
 
 var Types = { };
 
-var responseConverter = ({});
+var responseConverter = ({"__root":{"books_comments":{"n":""}}});
 
 function convertResponse(v) {
   return ReasonRelay._convertObj(v, responseConverter, undefined, undefined);

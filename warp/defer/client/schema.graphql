@@ -5,7 +5,7 @@ directive @stream on FIELD
 type Book {
   title: String!
   author: String!
-  comments: [Comment!]!
+  comments: [Comment!]
 }
 
 type Comment {
