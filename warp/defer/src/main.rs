@@ -102,13 +102,13 @@ async fn main() {
 
     println!("Playground: http://localhost:9000");
 
-    let graphql_post = async_graphql_warp::graphql(schema).and_then(
-        |(schema, builder): (_, QueryBuilder)| async move {
+    let graphql_post = warp::path::end()
+        .and(async_graphql_warp::graphql(schema))
+        .and_then(|(schema, builder): (_, QueryBuilder)| async move {
             let resp = builder.execute_stream(&schema).await;
             let stream: GQLResponseStream = resp.into();
             Ok::<_, Infallible>(stream.into_response())
-        },
-    );
+        });
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         Response::builder()
@@ -122,8 +122,8 @@ async fn main() {
         .allow_headers(vec!["authorization", "content-type"])
         .allow_methods(vec!["GET", "POST", "PUT", "DELETE"]);
 
-    let routes = graphql_post
-        .or(graphql_playground)
+    let routes = graphql_playground
+        .or(graphql_post)
         .recover(|err: Rejection| async move {
             if let Some(BadRequest(err)) = err.find() {
                 return Ok::<_, Infallible>(warp::reply::with_status(

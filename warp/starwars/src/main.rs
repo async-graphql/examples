@@ -27,8 +27,8 @@ async fn main() {
             .body(playground_source("/", None))
     });
 
-    let routes = graphql_post
-        .or(graphql_playground)
+    let routes = graphql_playground
+        .or(graphql_post)
         .recover(|err: Rejection| async move {
             if let Some(BadRequest(err)) = err.find() {
                 return Ok::<_, Infallible>(warp::reply::with_status(

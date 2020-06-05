@@ -5,8 +5,8 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.13.1"
-async-graphql-actix-web = "1.13.1"
+async-graphql = { path = "C:\\Users\\scott\\Documents\\work\\async-graphql" }
+async-graphql-actix-web = { path = "C:\\Users\\scott\\Documents\\work\\async-graphql\\async-graphql-actix-web" }
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
 actix-cors = "0.2.0"
