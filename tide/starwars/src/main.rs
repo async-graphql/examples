@@ -74,7 +74,7 @@ mod tests {
 
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
                     .body_string(r#"{"query":"{ human(id:\"1000\") {name} }"}"#.to_owned())
-                    .set_header("Content-Type".parse().unwrap(), "application/json")
+                    .set_header("Content-Type", "application/json")
                     .recv_string()
                     .await?;
 
