@@ -2,39 +2,58 @@ module Query = [%relay.query
   {|
     query pagesQuery {
       books {
-        title
-        author
-        comments @defer {
-          user
-          text
-        }
+        ...pages_book
       }
     }
   |}
 ];
 
+module BookCommentsFragment = [%relay.fragment
+  {|
+  fragment pages_comments_book on Book {
+    comments {
+      text
+      user
+    }
+  }
+|}
+];
+
 module Comments = {
   [@react.component]
-  let make = (~comments) => {
-    Query.Types.(
-      comments
-      ->Belt.Option.getWithDefault([||])
-      ->Belt.Array.map(comment => {
-          let text = comment.text;
-          let user = comment.user;
-          <li key=text> {j|$user: $text|j}->React.string </li>;
-        })
-      ->React.array
-    );
+  let make = (~bookRef) => {
+    let book = BookCommentsFragment.use(bookRef);
+    book.comments
+    ->Belt.Option.getWithDefault([||])
+    ->Belt.Array.map(comment => {
+        let text = comment.text;
+        let user = comment.user;
+        <li key=text> {j|$user: $text|j}->React.string </li>;
+      })
+    ->React.array;
   };
 };
 
+module BookFragment = [%relay.fragment
+  {|
+  fragment pages_book on Book {
+    title
+    author
+    ...pages_comments_book @defer
+  }
+|}
+];
+
 module Book = {
   [@react.component]
-  let make = (~title, ~author, ~comments) => {
+  let make = (~bookRef) => {
+    let book = BookFragment.use(bookRef);
+    let title = book.title;
+    let author = book.author;
+
     <div>
       <p> {j|$title by $author|j}->React.string </p>
-      <Comments comments />
+      <Comments bookRef={book.getFragmentRefs()} />
     </div>;
   };
 };
@@ -44,7 +63,6 @@ module Books = {
   let make = () => {
     let response = Query.use(~variables=(), ());
     let booksCount = response.books->Js.Array.length;
-    Js.log2("books: ", response.books);
 
     <div>
       <h2
@@ -52,13 +70,8 @@ module Books = {
         {j|Streaming $booksCount books....|j}->React.string
       </h2>
       {response.books
-       ->Belt.Array.map(book =>
-           <Book
-             key={book.title}
-             title={book.title}
-             author={book.author}
-             comments={book.comments}
-           />
+       ->Belt.Array.mapWithIndex((idx, book) =>
+           <Book key={string_of_int(idx)} bookRef={book.getFragmentRefs()} />
          )
        ->React.array}
     </div>;
