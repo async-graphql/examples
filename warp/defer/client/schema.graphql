@@ -1,0 +1,19 @@
+directive @defer on FIELD
+
+directive @stream on FIELD
+
+type Book {
+  title: String!
+  author: String!
+  comments: [Comment!]
+}
+
+type Comment {
+  user: String!
+  text: String!
+}
+
+type Query {
+  books: [Book!]!
+}
+

@@ -1,0 +1,60 @@
+{
+  "name": "warp-defer-client",
+  "version": "0.1.0",
+  "license": "ISC",
+  "engines": {
+    "node": "12.x"
+  },
+  "scripts": {
+    "clean": "rimraf .next && bsb -clean-world",
+    "dev": "run-p dev:*",
+    "dev:next": "next dev --port 3004",
+    "dev:relay": "yarn relay-watch",
+    "dev:reason": "bsb -make-world -w",
+    "build": "yarn clean && yarn relay && yarn build:reason && yarn build:next",
+    "build:reason": "bsb -make-world",
+    "build:next": "next build",
+    "relay": "reason-relay-compiler",
+    "relay-watch": "reason-relay-compiler --watch",
+    "update-schema": "get-graphql-schema http://localhost:9000 > schema.graphql",
+    "update-graphql": "yarn update-schema && yarn relay"
+  },
+  "dependencies": {
+    "@tailwindcss/ui": "0.3.0",
+    "bs-fetch": "0.5.2",
+    "bs-platform": "7.3.2",
+    "fetch-multipart-graphql": "2.0.1",
+    "graphql": "15.0.0",
+    "next": "9.4.4",
+    "re-classnames": "4.1.0",
+    "react": "0.0.0-experimental-33c3af284",
+    "react-dom": "0.0.0-experimental-33c3af284",
+    "react-relay": "0.0.0-experimental-895a6fe0",
+    "reason-promise": "1.0.2",
+    "reason-react": "0.9.0-dev.1",
+    "reason-relay": "0.9.2",
+    "relay-runtime": "9.1.0",
+    "webpack": "4.43.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.10.2",
+    "@fullhuman/postcss-purgecss": "2.2.0",
+    "autoprefixer": "9.8.0",
+    "babel-plugin-relay": "9.1.0",
+    "get-graphql-schema": "2.1.2",
+    "next-transpile-modules": "3.3.0",
+    "npm-run-all": "4.1.5",
+    "postcss-preset-env": "6.7.0",
+    "prettier": "2.0.5",
+    "reason-promise": "1.0.2",
+    "relay-compiler": "9.1.0",
+    "relay-config": "9.1.0",
+    "rimraf": "3.0.2",
+    "tailwindcss": "1.4.6"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true
+  }
+}
