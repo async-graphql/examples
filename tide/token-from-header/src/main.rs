@@ -1,6 +1,6 @@
 #![allow(clippy::needless_lifetimes)]
 
-use async_graphql::http::playground_source;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema};
 use async_std::task;
 use std::env;
@@ -58,7 +58,7 @@ async fn run() -> Result<()> {
     app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
         let resp = Response::new(StatusCode::Ok)
-            .body_string(playground_source("/graphql", None))
+            .body_string(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
             .set_header(headers::CONTENT_TYPE, mime::HTML.to_string());
 
         Ok(resp)

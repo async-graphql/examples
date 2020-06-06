@@ -1,6 +1,6 @@
 use actix_cors::Cors;
 use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
-use async_graphql::http::playground_source;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Deferred, EmptyMutation, EmptySubscription, Object, Schema};
 use async_graphql_actix_web::{GQLRequest, GQLResponseStream};
 use std::time::Duration;
@@ -103,7 +103,9 @@ async fn index(schema: web::Data<DeferSchema>, req: GQLRequest) -> GQLResponseSt
 async fn index_playground() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source("/", Some("/"))))
+        .body(playground_source(
+            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
+        )))
 }
 
 #[actix_rt::main]

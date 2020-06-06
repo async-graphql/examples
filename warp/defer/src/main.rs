@@ -1,4 +1,4 @@
-use async_graphql::http::playground_source;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Deferred, EmptyMutation, EmptySubscription, Object, QueryBuilder, Schema};
 use async_graphql_warp::{BadRequest, GQLResponseStream};
 use http::StatusCode;
@@ -113,7 +113,7 @@ async fn main() {
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         Response::builder()
             .header("content-type", "text/html")
-            .body(playground_source("/", None))
+            .body(playground_source(GraphQLPlaygroundConfig::new("/")))
     });
 
     let cors = warp::cors()

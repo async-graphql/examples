@@ -2,7 +2,7 @@
 
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
-use async_graphql::http::playground_source;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, Data, EmptyMutation, FieldResult, Schema};
 use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 use futures::{stream, Stream};
@@ -51,7 +51,9 @@ async fn index(
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source("/", Some("/")))
+        .body(playground_source(
+            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
+        ))
 }
 
 async fn index_ws(

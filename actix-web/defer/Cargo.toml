@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 async-graphql = "1.14.13"
-async-graphql-warp = "1.14.9"
+async-graphql-actix-web = "1.14.9"
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
 actix-cors = "0.2.0"

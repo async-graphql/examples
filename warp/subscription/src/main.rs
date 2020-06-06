@@ -1,4 +1,4 @@
-use async_graphql::http::playground_source;
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{QueryBuilder, Schema};
 use async_graphql_warp::{graphql_subscription, GQLResponse};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
@@ -23,7 +23,9 @@ async fn main() {
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         Response::builder()
             .header("content-type", "text/html")
-            .body(playground_source("/", Some("/")))
+            .body(playground_source(
+                GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
+            ))
     });
 
     let routes = graphql_playground
