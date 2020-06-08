@@ -3,10 +3,7 @@ use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_std::task;
 use starwars::{QueryRoot, StarWars};
 use std::env;
-use tide::{
-    http::{headers, mime},
-    Request, Response, StatusCode,
-};
+use tide::{http::mime, Body, Request, Response, StatusCode};
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 struct AppState {
@@ -36,10 +33,11 @@ async fn run() -> Result<()> {
 
     app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
-        let resp = Response::new(StatusCode::Ok)
-            .body_string(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
-            .set_header(headers::CONTENT_TYPE, mime::HTML.to_string());
-
+        let mut resp = Response::new(StatusCode::Ok);
+        resp.set_body(Body::from_string(playground_source(
+            GraphQLPlaygroundConfig::new("/graphql"),
+        )));
+        resp.set_content_type(mime::HTML);
         Ok(resp)
     });
 
