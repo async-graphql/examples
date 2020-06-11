@@ -79,7 +79,6 @@ impl MutationRoot {
 }
 
 #[async_graphql::Enum]
-#[derive(Copy, Clone)]
 enum MutationType {
     Created,
     Deleted,
