@@ -1,0 +1,13 @@
+[package]
+name = "actix-web-full-query-error-log"
+version = "0.1.0"
+authors = ["Midas Lambrichts"]
+edition = "2018"
+
+[dependencies]
+async-graphql = "1.15.7"
+async-graphql-actix-web = "1.14.14"
+actix-web = "2.0.0"
+actix-rt = "1.1.1"
+log = "0.4.8"
+env_logger = "0.7.1"

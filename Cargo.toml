@@ -10,6 +10,7 @@ members = [
     "actix-web/starwars",
     "actix-web/error-extensions",
     "actix-web/defer",
+    "actix-web/full-query-error-log",
 
     "warp/starwars",
     "warp/subscription",
