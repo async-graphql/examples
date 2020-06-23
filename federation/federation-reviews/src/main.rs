@@ -53,7 +53,7 @@ struct Review {
     #[field(ref)]
     body: String,
 
-    #[field(provides = "username", ref)]
+    #[field(ref)]
     author: User,
 
     #[field(ref)]
