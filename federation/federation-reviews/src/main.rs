@@ -50,13 +50,8 @@ impl Product {
 
 #[SimpleObject]
 struct Review {
-    #[field(ref)]
     body: String,
-
-    #[field(ref)]
     author: User,
-
-    #[field(ref)]
     product: Product,
 }
 
