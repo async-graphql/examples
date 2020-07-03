@@ -28,8 +28,8 @@ async fn main() {
             ))
     });
 
-    let routes = graphql_playground
-        .or(graphql_subscription(schema))
+    let routes = graphql_subscription(schema)
+        .or(graphql_playground)
         .or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }
