@@ -20,7 +20,7 @@ impl User {
     }
 
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
-        let reviews = ctx.data::<Vec<Review>>();
+        let reviews = ctx.data_unchecked::<Vec<Review>>();
         reviews
             .iter()
             .filter(|review| review.author.id == self.id)
@@ -40,7 +40,7 @@ impl Product {
     }
 
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
-        let reviews = ctx.data::<Vec<Review>>();
+        let reviews = ctx.data_unchecked::<Vec<Review>>();
         reviews
             .iter()
             .filter(|review| review.product.upc == self.upc)

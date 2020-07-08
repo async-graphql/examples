@@ -20,7 +20,7 @@ struct Query;
 #[Object(extends)]
 impl Query {
     async fn top_products<'a>(&self, ctx: &'a Context<'_>) -> &'a Vec<Product> {
-        ctx.data::<Vec<Product>>()
+        ctx.data_unchecked::<Vec<Product>>()
     }
 
     #[entity]
@@ -29,7 +29,7 @@ impl Query {
         ctx: &'a Context<'_>,
         upc: String,
     ) -> Option<&'a Product> {
-        let hats = ctx.data::<Vec<Product>>();
+        let hats = ctx.data_unchecked::<Vec<Product>>();
         hats.iter().find(|product| product.upc == upc)
     }
 }
