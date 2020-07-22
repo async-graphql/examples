@@ -22,17 +22,17 @@ pub struct Human(usize);
 impl Human {
     /// The id of the human.
     async fn id(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].id
+        ctx.data::<StarWars>().chars[self.0].id
     }
 
     /// The name of the human.
     async fn name(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].name
+        ctx.data::<StarWars>().chars[self.0].name
     }
 
     /// The friends of the human, or an empty list if they have none.
     async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
-        ctx.data_unchecked::<StarWars>().chars[self.0]
+        ctx.data::<StarWars>().chars[self.0]
             .friends
             .iter()
             .map(|id| Human(*id).into())
@@ -41,12 +41,12 @@ impl Human {
 
     /// Which movies they appear in.
     async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].appears_in
+        &ctx.data::<StarWars>().chars[self.0].appears_in
     }
 
     /// The home planet of the human, or null if unknown.
     async fn home_planet<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].home_planet
+        &ctx.data::<StarWars>().chars[self.0].home_planet
     }
 }
 
@@ -57,17 +57,17 @@ pub struct Droid(usize);
 impl Droid {
     /// The id of the droid.
     async fn id(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].id
+        ctx.data::<StarWars>().chars[self.0].id
     }
 
     /// The name of the droid.
     async fn name(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].name
+        ctx.data::<StarWars>().chars[self.0].name
     }
 
     /// The friends of the droid, or an empty list if they have none.
     async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
-        ctx.data_unchecked::<StarWars>().chars[self.0]
+        ctx.data::<StarWars>().chars[self.0]
             .friends
             .iter()
             .map(|id| Droid(*id).into())
@@ -76,12 +76,12 @@ impl Droid {
 
     /// Which movies they appear in.
     async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].appears_in
+        &ctx.data::<StarWars>().chars[self.0].appears_in
     }
 
     /// The primary function of the droid.
     async fn primary_function<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].primary_function
+        &ctx.data::<StarWars>().chars[self.0].primary_function
     }
 }
 
@@ -98,9 +98,9 @@ impl QueryRoot {
         episode: Episode,
     ) -> Character {
         if episode == Episode::Empire {
-            Human(ctx.data_unchecked::<StarWars>().luke).into()
+            Human(ctx.data::<StarWars>().luke).into()
         } else {
-            Droid(ctx.data_unchecked::<StarWars>().artoo).into()
+            Droid(ctx.data::<StarWars>().artoo).into()
         }
     }
 
@@ -109,7 +109,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         #[arg(desc = "id of the human")] id: String,
     ) -> Option<Human> {
-        ctx.data_unchecked::<StarWars>().human(&id).map(Human)
+        ctx.data::<StarWars>().human(&id).map(Human)
     }
 
     async fn humans(
@@ -121,7 +121,7 @@ impl QueryRoot {
         last: Option<i32>,
     ) -> FieldResult<Connection<usize, Human, EmptyFields, EmptyFields>> {
         let humans = ctx
-            .data_unchecked::<StarWars>()
+            .data::<StarWars>()
             .humans()
             .iter()
             .copied()
@@ -136,7 +136,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         #[arg(desc = "id of the droid")] id: String,
     ) -> Option<Droid> {
-        ctx.data_unchecked::<StarWars>().droid(&id).map(Droid)
+        ctx.data::<StarWars>().droid(&id).map(Droid)
     }
 
     async fn droids(
@@ -148,7 +148,7 @@ impl QueryRoot {
         last: Option<i32>,
     ) -> FieldResult<Connection<usize, Droid, EmptyFields, EmptyFields>> {
         let droids = ctx
-            .data_unchecked::<StarWars>()
+            .data::<StarWars>()
             .droids()
             .iter()
             .copied()

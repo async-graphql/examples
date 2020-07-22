@@ -36,7 +36,7 @@ pub struct QueryRoot;
 #[async_graphql::Object]
 impl QueryRoot {
     async fn books(&self, ctx: &Context<'_>) -> Vec<Book> {
-        let books = ctx.data_unchecked::<Storage>().lock().await;
+        let books = ctx.data::<Storage>().lock().await;
         books.iter().map(|(_, book)| book).cloned().collect()
     }
 }
@@ -46,7 +46,7 @@ pub struct MutationRoot;
 #[async_graphql::Object]
 impl MutationRoot {
     async fn create_book(&self, ctx: &Context<'_>, name: String, author: String) -> ID {
-        let mut books = ctx.data_unchecked::<Storage>().lock().await;
+        let mut books = ctx.data::<Storage>().lock().await;
         let entry = books.vacant_entry();
         let id: ID = entry.key().into();
         let book = Book {
@@ -63,7 +63,7 @@ impl MutationRoot {
     }
 
     async fn delete_book(&self, ctx: &Context<'_>, id: ID) -> FieldResult<bool> {
-        let mut books = ctx.data_unchecked::<Storage>().lock().await;
+        let mut books = ctx.data::<Storage>().lock().await;
         let id = id.parse::<usize>()?;
         if books.contains(id) {
             books.remove(id);

@@ -5,6 +5,6 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.16"
+async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
 slab = "0.4.2"
 futures = "0.3.0"

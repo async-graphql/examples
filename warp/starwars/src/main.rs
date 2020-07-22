@@ -1,6 +1,6 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, QueryBuilder, Schema};
-use async_graphql_warp::{BadRequest, GQLResponse};
+use async_graphql::{EmptyMutation, EmptySubscription, Schema, BatchQueryDefinition};
+use async_graphql_warp::{BadRequest, BatchGQLResponse};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
 use std::convert::Infallible;
@@ -15,9 +15,9 @@ async fn main() {
     println!("Playground: http://localhost:8000");
 
     let graphql_post = async_graphql_warp::graphql(schema).and_then(
-        |(schema, builder): (_, QueryBuilder)| async move {
-            let resp = builder.execute(&schema).await;
-            Ok::<_, Infallible>(GQLResponse::from(resp))
+        |(schema, definition): (_, BatchQueryDefinition)| async move {
+            let resp = definition.execute(&schema).await;
+            Ok::<_, Infallible>(BatchGQLResponse::from(resp))
         },
     );
 

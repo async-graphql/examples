@@ -7,7 +7,7 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
     Schema,
 };
-use async_graphql_actix_web::{GQLRequest, GQLResponse};
+use async_graphql_actix_web::{BatchGQLRequest, BatchGQLResponse};
 use serde_json::json;
 
 #[derive(Debug, Error)]
@@ -99,8 +99,8 @@ impl QueryRoot {
 
 async fn index(
     schema: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
-    req: GQLRequest,
-) -> GQLResponse {
+    req: BatchGQLRequest,
+) -> BatchGQLResponse {
     req.into_inner().execute(&schema).await.into()
 }
 

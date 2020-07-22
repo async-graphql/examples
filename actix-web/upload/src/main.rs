@@ -1,10 +1,10 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptySubscription, IntoQueryBuilderOpts, Schema};
-use async_graphql_actix_web::{GQLRequest, GQLResponse};
+use async_graphql_actix_web::{BatchGQLRequest, BatchGQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 
-async fn index(schema: web::Data<FilesSchema>, req: GQLRequest) -> GQLResponse {
+async fn index(schema: web::Data<FilesSchema>, req: BatchGQLRequest) -> BatchGQLResponse {
     req.into_inner().execute(&schema).await.into()
 }
 

@@ -19,7 +19,7 @@ pub struct QueryRoot;
 #[async_graphql::Object]
 impl QueryRoot {
     async fn uploads(&self, ctx: &Context<'_>) -> Vec<FileInfo> {
-        let storage = ctx.data_unchecked::<Storage>().lock().await;
+        let storage = ctx.data::<Storage>().lock().await;
         storage.iter().map(|(_, file)| file).cloned().collect()
     }
 }
@@ -29,7 +29,7 @@ pub struct MutationRoot;
 #[async_graphql::Object]
 impl MutationRoot {
     async fn single_upload(&self, ctx: &Context<'_>, file: Upload) -> FileInfo {
-        let mut storage = ctx.data_unchecked::<Storage>().lock().await;
+        let mut storage = ctx.data::<Storage>().lock().await;
         println!("files count: {}", storage.len());
         let entry = storage.vacant_entry();
         let info = FileInfo {
@@ -43,7 +43,7 @@ impl MutationRoot {
 
     async fn multiple_upload(&self, ctx: &Context<'_>, files: Vec<Upload>) -> Vec<FileInfo> {
         let mut infos = Vec::new();
-        let mut storage = ctx.data_unchecked::<Storage>().lock().await;
+        let mut storage = ctx.data::<Storage>().lock().await;
         for file in files {
             let entry = storage.vacant_entry();
             let info = FileInfo {

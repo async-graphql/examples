@@ -5,8 +5,8 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.16"
-async-graphql-warp = "1.14.9"
+async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
+async-graphql-warp = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"
 serde_json = "1.0"

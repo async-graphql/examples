@@ -91,7 +91,7 @@ impl QueryRoot {
     async fn book(&self, ctx: &Context<'_>, id: i32) -> FieldResult<Option<Book>> {
         println!("pre load book by id {:?}", id);
         match ctx
-            .data_unchecked::<Loader<i32, BookBatcherLoadHashMapValue, BookBatcher>>()
+            .data::<Loader<i32, BookBatcherLoadHashMapValue, BookBatcher>>()
             .load(id)
             .await
         {

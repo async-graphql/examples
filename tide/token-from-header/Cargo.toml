@@ -5,8 +5,8 @@ authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "1.16"
-async-graphql-tide = "1.15.13"
+async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
+async-graphql-tide = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
 tide = "0.11"
 async-std = "1.5.0"
 
