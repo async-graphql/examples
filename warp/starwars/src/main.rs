@@ -1,5 +1,5 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema, BatchQueryDefinition};
+use async_graphql::{BatchQueryDefinition, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_warp::{BadRequest, BatchGQLResponse};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};

@@ -1,4 +1,6 @@
-use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID, BatchQueryDefinition};
+use async_graphql::{
+    BatchQueryDefinition, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID,
+};
 use async_graphql_warp::{graphql, BatchGQLResponse};
 use std::convert::Infallible;
 use warp::{Filter, Reply};
@@ -35,12 +37,12 @@ impl Query {
 async fn main() {
     let schema = Schema::new(Query, EmptyMutation, EmptySubscription);
 
-    warp::serve(
-        graphql(schema).and_then(|(schema, definition): (_, BatchQueryDefinition)| async move {
+    warp::serve(graphql(schema).and_then(
+        |(schema, definition): (_, BatchQueryDefinition)| async move {
             let resp = definition.execute(&schema).await;
             Ok::<_, Infallible>(BatchGQLResponse::from(resp).into_response())
-        }),
-    )
+        },
+    ))
     .run(([0, 0, 0, 0], 4001))
     .await;
 }

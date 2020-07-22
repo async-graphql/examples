@@ -1,6 +1,8 @@
 #![allow(clippy::needless_lifetimes)]
 
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, BatchQueryDefinition};
+use async_graphql::{
+    BatchQueryDefinition, Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject,
+};
 use async_graphql_warp::{graphql, BatchGQLResponse};
 use std::convert::Infallible;
 use warp::{Filter, Reply};
@@ -55,12 +57,12 @@ async fn main() {
         .data(hats)
         .finish();
 
-    warp::serve(
-        graphql(schema).and_then(|(schema, definition): (_, BatchQueryDefinition)| async move {
+    warp::serve(graphql(schema).and_then(
+        |(schema, definition): (_, BatchQueryDefinition)| async move {
             let resp = definition.execute(&schema).await;
             Ok::<_, Infallible>(BatchGQLResponse::from(resp).into_response())
-        }),
-    )
+        },
+    ))
     .run(([0, 0, 0, 0], 4002))
     .await;
 }

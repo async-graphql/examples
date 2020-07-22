@@ -1,7 +1,7 @@
 #![allow(clippy::needless_lifetimes)]
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, Data, EmptyMutation, FieldResult, Schema, BatchQueryDefinition};
+use async_graphql::{BatchQueryDefinition, Context, Data, EmptyMutation, FieldResult, Schema};
 use async_graphql_warp::{graphql_subscription_with_data, BatchGQLResponse};
 use futures::{stream, Stream};
 use std::convert::Infallible;
