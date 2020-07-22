@@ -1,8 +1,8 @@
 #![allow(clippy::needless_lifetimes)]
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, Data, EmptyMutation, FieldResult, QueryBuilder, Schema};
-use async_graphql_warp::{graphql_subscription_with_data, GQLResponse};
+use async_graphql::{BatchQueryDefinition, Context, Data, EmptyMutation, FieldResult, Schema};
+use async_graphql_warp::{graphql_subscription_with_data, BatchGQLResponse};
 use futures::{stream, Stream};
 use std::convert::Infallible;
 use warp::{http::Response, Filter};
@@ -39,12 +39,12 @@ async fn main() {
     let graphql_post = warp::header::optional::<String>("token")
         .and(async_graphql_warp::graphql(schema.clone()))
         .and_then(
-            |token, (schema, mut builder): (_, QueryBuilder)| async move {
+            |token, (schema, mut definition): (_, BatchQueryDefinition)| async move {
                 if let Some(token) = token {
-                    builder = builder.data(MyToken(token));
+                    definition = definition.data(MyToken(token));
                 }
-                let resp = builder.execute(&schema).await;
-                Ok::<_, Infallible>(GQLResponse::from(resp))
+                let resp = definition.execute(&schema).await;
+                Ok::<_, Infallible>(BatchGQLResponse::from(resp))
             },
         );
 
