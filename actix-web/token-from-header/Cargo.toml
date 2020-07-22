@@ -5,8 +5,8 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
-async-graphql-actix-web = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
+async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "06e4398"}
+async-graphql-actix-web = {git = "https://github.com/msdinit/async-graphql", rev = "06e4398"}
 actix-web = "2.0.0"
 actix-rt = "1.0.0"
 futures = "0.3"

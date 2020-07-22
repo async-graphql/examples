@@ -5,7 +5,7 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
-async-graphql-warp = {git = "https://github.com/msdinit/async-graphql", rev = "eed6fac"}
+async-graphql = {git = "https://github.com/msdinit/async-graphql", rev = "06e4398"}
+async-graphql-warp = {git = "https://github.com/msdinit/async-graphql", rev = "06e4398"}
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"
