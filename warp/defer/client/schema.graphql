@@ -1,6 +1,12 @@
-directive @defer on FIELD
+directive @defer(
+  """Relay fragment label"""
+  label: String
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
-directive @stream on FIELD
+directive @stream(
+  """Relay fragment label"""
+  label: String
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
 type Book {
   title: String!
