@@ -9,12 +9,10 @@ members = [
     "actix-web/upload",
     "actix-web/starwars",
     "actix-web/error-extensions",
-    "actix-web/defer",
 
     "warp/starwars",
     "warp/subscription",
     "warp/token-from-header",
-    "warp/defer",
 
     "federation/federation-accounts",
     "federation/federation-products",

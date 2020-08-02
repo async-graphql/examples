@@ -18,6 +18,7 @@ impl QueryRoot {
     }
 }
 
+#[derive(Clone)]
 struct AppState {
     schema: Schema<QueryRoot, EmptyMutation, EmptySubscription>,
 }
