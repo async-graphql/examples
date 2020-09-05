@@ -1,6 +1,9 @@
-use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::{playground_source, GraphQLPlaygroundConfig}};
-use async_graphql_rocket::{GQLRequest, GraphQL, GQLResponse};
-use rocket::{response::content, routes, State, http::Status};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
+use async_graphql_rocket::{GQLRequest, GQLResponse, GraphQL};
+use rocket::{http::Status, response::content, routes, State};
 use starwars::{QueryRoot, StarWars};
 
 pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
@@ -11,15 +14,19 @@ fn graphql_playground() -> content::Html<String> {
 }
 
 #[rocket::post("/?<query..>")]
-async fn graphql_query(schema: State<'_, StarWarsSchema>, query: GQLRequest) -> Result<GQLResponse, Status> {
-    query.execute(&schema)
-        .await
+async fn graphql_query(
+    schema: State<'_, StarWarsSchema>,
+    query: GQLRequest,
+) -> Result<GQLResponse, Status> {
+    query.execute(&schema).await
 }
 
 #[rocket::post("/", data = "<request>", format = "application/json")]
-async fn graphql_request(schema: State<'_, StarWarsSchema>, request: GQLRequest) -> Result<GQLResponse, Status> {
-    request.execute(&schema)
-        .await
+async fn graphql_request(
+    schema: State<'_, StarWarsSchema>,
+    request: GQLRequest,
+) -> Result<GQLResponse, Status> {
+    request.execute(&schema).await
 }
 
 #[rocket::launch]
@@ -28,7 +35,8 @@ fn rocket() -> rocket::Rocket {
         .data(StarWars::new())
         .finish();
 
-    rocket::ignite()
-        .attach(GraphQL::fairing(schema))
-        .mount("/", routes![graphql_query, graphql_request, graphql_playground])
+    rocket::ignite().attach(GraphQL::fairing(schema)).mount(
+        "/",
+        routes![graphql_query, graphql_request, graphql_playground],
+    )
 }
