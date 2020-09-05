@@ -1,0 +1,23 @@
+# For more information take a look at https://rocket.rs/guide/configuration/
+[global.limits]
+graphql = 131072
+
+[development]
+address = "localhost"
+port = 8000
+keep_alive = 5
+log = "normal"
+
+
+[staging]
+address = "0.0.0.0"
+port = 8080
+keep_alive = 5
+log = "normal"
+
+
+[production]
+address = "0.0.0.0"
+port = 8080
+keep_alive = 5
+log = "critical"
