@@ -72,8 +72,8 @@ mod tests {
                 task::sleep(Duration::from_millis(300)).await;
 
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
-                    .body_string(r#"{"query":"{ human(id:\"1000\") {name} }"}"#.to_owned())
-                    .set_header("Content-Type", "application/json")
+                    .body(Body::from(r#"{"query":"{ human(id:\"1000\") {name} }"}"#))
+                    .header("Content-Type", "application/json")
                     .recv_string()
                     .await?;
 

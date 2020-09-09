@@ -195,11 +195,10 @@ mod tests {
 
                 //
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
-                    .body_string(
-                        r#"{"query":"{ book1: book(id: 1) {id, name, author} book2: book(id: 2) {id, name, author} book3: book(id: 3) {id, name, author} book4: book(id: 4) {id, name, author} }"}"#
-                            .to_owned(),
+                    .body(
+                        Body::from(r#"{"query":"{ book1: book(id: 1) {id, name, author} book2: book(id: 2) {id, name, author} book3: book(id: 3) {id, name, author} book4: book(id: 4) {id, name, author} }"}"#),
                     )
-                    .set_header("Content-Type", "application/json")
+                    .header("Content-Type", "application/json")
                     .recv_string()
                     .await?;
                 println!("{}", string);
@@ -221,11 +220,10 @@ mod tests {
 
                 //
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
-                    .body_string(
-                        r#"{"query":"{ book1: book(id: 1) {id, name, author} book4: book(id: 4) {id, name, author} book9: book(id: 9) {id, name, author} }"}"#
-                            .to_owned(),
+                    .body(
+                        Body::from(r#"{"query":"{ book1: book(id: 1) {id, name, author} book4: book(id: 4) {id, name, author} book9: book(id: 9) {id, name, author} }"}"#),
                     )
-                    .set_header("Content-Type", "application/json")
+                    .header("Content-Type", "application/json")
                     .recv_string()
                     .await?;
                 println!("{}", string);

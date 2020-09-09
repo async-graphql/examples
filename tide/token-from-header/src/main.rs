@@ -93,17 +93,17 @@ mod tests {
                 task::sleep(Duration::from_millis(300)).await;
 
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
-                    .body_bytes(r#"{"query":"{ currentToken }"}"#)
-                    .set_header("Content-Type", "application/json")
-                    .set_header("Token", "1234")
+                    .body(Body::from(r#"{"query":"{ currentToken }"}"#))
+                    .header("Content-Type", "application/json")
+                    .header("Token", "1234")
                     .recv_string()
                     .await?;
 
                 assert_eq!(string, json!({"data":{"currentToken":"1234"}}).to_string());
 
                 let string = surf::post(format!("http://{}/graphql", listen_addr))
-                    .body_bytes(r#"{"query":"{ currentToken }"}"#)
-                    .set_header("Content-Type", "application/json")
+                    .body(Body::from(r#"{"query":"{ currentToken }"}"#))
+                    .header("Content-Type", "application/json")
                     .recv_string()
                     .await?;
 

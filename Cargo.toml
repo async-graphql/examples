@@ -22,5 +22,5 @@ members = [
     "tide/token-from-header",
     "tide/dataloader",
 
-    "rocket/starwars",
+    #"rocket/starwars",
 ]
