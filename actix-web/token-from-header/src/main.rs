@@ -41,11 +41,11 @@ async fn index(
         .headers()
         .get("Token")
         .and_then(|value| value.to_str().map(|s| MyToken(s.to_string())).ok());
-    let mut query = gql_request.into_inner();
+    let mut request = gql_request.into_inner();
     if let Some(token) = token {
-        query = query.data(token);
+        request = request.data(token);
     }
-    query.execute(&schema).await.into()
+    schema.execute(request).await.into()
 }
 
 async fn gql_playgound() -> HttpResponse {
@@ -62,7 +62,7 @@ async fn index_ws(
     payload: web::Payload,
 ) -> Result<HttpResponse> {
     ws::start_with_protocols(
-        WSSubscription::new(&schema).init_context_data(|value| {
+        WSSubscription::new(&schema).initializer(|value| {
             #[derive(serde_derive::Deserialize)]
             struct Payload {
                 token: String,

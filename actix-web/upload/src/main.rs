@@ -1,11 +1,11 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptySubscription, IntoQueryBuilderOpts, Schema};
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig, MultipartOptions};
+use async_graphql::{EmptySubscription, Schema};
 use async_graphql_actix_web::{GQLRequest, GQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 
 async fn index(schema: web::Data<FilesSchema>, req: GQLRequest) -> GQLResponse {
-    req.into_inner().execute(&schema).await.into()
+    schema.execute(req.into_inner()).await.into()
 }
 
 async fn gql_playgound() -> HttpResponse {
@@ -25,12 +25,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
-            .service(web::resource("/").guard(guard::Post()).to(index).app_data(
-                IntoQueryBuilderOpts {
-                    max_num_files: Some(3),
-                    ..IntoQueryBuilderOpts::default()
-                },
-            ))
+            .service(
+                web::resource("/")
+                    .guard(guard::Post())
+                    .to(index)
+                    .app_data(MultipartOptions::default().max_num_files(3)),
+            )
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
     .bind("127.0.0.1:8000")?

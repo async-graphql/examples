@@ -5,7 +5,7 @@ use async_graphql_actix_web::{GQLRequest, GQLResponse};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 
 async fn index(schema: web::Data<StarWarsSchema>, req: GQLRequest) -> GQLResponse {
-    req.into_inner().execute(&schema).await.into()
+    schema.execute(req.into_inner()).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {

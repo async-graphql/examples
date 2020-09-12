@@ -6,7 +6,7 @@ use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
 async fn index(schema: web::Data<BooksSchema>, req: GQLRequest) -> GQLResponse {
-    req.into_inner().execute(&schema).await.into()
+    schema.execute(req.into_inner()).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {

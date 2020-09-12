@@ -1,9 +1,6 @@
 #![allow(clippy::needless_lifetimes)]
 
-use async_graphql::http::GQLResponse;
-use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, Object, QueryBuilder, Schema, SimpleObject, ID,
-};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
 use warp::{Filter, Reply};
@@ -100,12 +97,14 @@ async fn main() {
         .data(reviews)
         .finish();
 
-    warp::serve(
-        graphql(schema).and_then(|(schema, builder): (_, QueryBuilder)| async move {
-            let resp = builder.execute(&schema).await;
-            Ok::<_, Infallible>(warp::reply::json(&GQLResponse(resp)).into_response())
-        }),
-    )
+    warp::serve(graphql(schema).and_then(
+        |(schema, request): (
+            Schema<Query, EmptyMutation, EmptySubscription>,
+            async_graphql::Request,
+        )| async move {
+            Ok::<_, Infallible>(warp::reply::json(&schema.execute(request).await).into_response())
+        },
+    ))
     .run(([0, 0, 0, 0], 4003))
     .await;
 }

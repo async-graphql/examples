@@ -1,5 +1,5 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{QueryBuilder, Schema};
+use async_graphql::Schema;
 use async_graphql_warp::{graphql_subscription, GQLResponse};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use std::convert::Infallible;
@@ -14,10 +14,10 @@ async fn main() {
     println!("Playground: http://localhost:8000");
 
     let graphql_post = async_graphql_warp::graphql(schema.clone()).and_then(
-        |(schema, builder): (_, QueryBuilder)| async move {
-            let resp = builder.execute(&schema).await;
-            Ok::<_, Infallible>(GQLResponse::from(resp))
-        },
+        |(schema, request): (
+            Schema<QueryRoot, MutationRoot, SubscriptionRoot>,
+            async_graphql::Request,
+        )| async move { Ok::<_, Infallible>(GQLResponse::from(schema.execute(request).await)) },
     );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
