@@ -1,7 +1,7 @@
 #![allow(clippy::needless_lifetimes)]
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, GQLObject, Schema};
 use async_std::task;
 use std::env;
 use tide::{http::mime, Body, Request, Response, StatusCode};
@@ -11,7 +11,7 @@ struct MyToken(String);
 
 struct QueryRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl QueryRoot {
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())

@@ -1,11 +1,10 @@
-use async_graphql::{Context, EmptySubscription, Schema, Upload, ID};
+use async_graphql::{Context, EmptySubscription, GQLObject, GQLSimpleObject, Schema, Upload, ID};
 use futures::lock::Mutex;
 use slab::Slab;
 
 pub type FilesSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 
-#[async_graphql::SimpleObject]
-#[derive(Clone)]
+#[derive(Clone, GQLSimpleObject)]
 pub struct FileInfo {
     id: ID,
     filename: String,
@@ -16,7 +15,7 @@ pub type Storage = Mutex<Slab<FileInfo>>;
 
 pub struct QueryRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl QueryRoot {
     async fn uploads(&self, ctx: &Context<'_>) -> Vec<FileInfo> {
         let storage = ctx.data_unchecked::<Storage>().lock().await;
@@ -26,7 +25,7 @@ impl QueryRoot {
 
 pub struct MutationRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl MutationRoot {
     async fn single_upload(&self, ctx: &Context<'_>, file: Upload) -> FileInfo {
         let mut storage = ctx.data_unchecked::<Storage>().lock().await;

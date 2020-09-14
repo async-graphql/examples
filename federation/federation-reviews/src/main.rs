@@ -1,6 +1,8 @@
 #![allow(clippy::needless_lifetimes)]
 
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
+use async_graphql::{
+    Context, EmptyMutation, EmptySubscription, GQLObject, GQLSimpleObject, Schema, ID,
+};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
 use warp::{Filter, Reply};
@@ -9,7 +11,7 @@ struct User {
     id: ID,
 }
 
-#[Object(extends)]
+#[GQLObject(extends)]
 impl User {
     #[field(external)]
     async fn id(&self) -> &ID {
@@ -29,7 +31,7 @@ struct Product {
     upc: String,
 }
 
-#[Object(extends)]
+#[GQLObject(extends)]
 impl Product {
     #[field(external)]
     async fn upc(&self) -> &String {
@@ -45,7 +47,7 @@ impl Product {
     }
 }
 
-#[SimpleObject]
+#[derive(GQLSimpleObject)]
 struct Review {
     body: String,
     author: User,
@@ -54,7 +56,7 @@ struct Review {
 
 struct Query;
 
-#[Object]
+#[GQLObject]
 impl Query {
     #[entity]
     async fn find_user_by_id(&self, id: ID) -> User {

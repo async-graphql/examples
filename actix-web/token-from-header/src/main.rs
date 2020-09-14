@@ -3,7 +3,9 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, Data, EmptyMutation, FieldResult, Schema};
+use async_graphql::{
+    Context, Data, EmptyMutation, FieldResult, GQLObject, GQLSubscription, Schema,
+};
 use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 use futures::{stream, Stream};
 
@@ -13,7 +15,7 @@ struct MyToken(String);
 
 struct QueryRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl QueryRoot {
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
@@ -22,7 +24,7 @@ impl QueryRoot {
 
 struct SubscriptionRoot;
 
-#[async_graphql::Subscription]
+#[GQLSubscription]
 impl SubscriptionRoot {
     async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
         if ctx.data_unchecked::<MyToken>().0 != "123456" {

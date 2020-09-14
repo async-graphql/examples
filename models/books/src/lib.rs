@@ -1,6 +1,9 @@
-use async_graphql::{Context, FieldResult, Schema, SimpleBroker, ID};
+mod simple_broker;
+
+use async_graphql::{Context, FieldResult, GQLEnum, GQLObject, GQLSubscription, Schema, ID};
 use futures::lock::Mutex;
 use futures::{Stream, StreamExt};
+use simple_broker::SimpleBroker;
 use slab::Slab;
 use std::sync::Arc;
 use std::time::Duration;
@@ -14,7 +17,7 @@ pub struct Book {
     author: String,
 }
 
-#[async_graphql::Object]
+#[GQLObject]
 impl Book {
     async fn id(&self) -> &str {
         &self.id
@@ -33,7 +36,7 @@ pub type Storage = Arc<Mutex<Slab<Book>>>;
 
 pub struct QueryRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl QueryRoot {
     async fn books(&self, ctx: &Context<'_>) -> Vec<Book> {
         let books = ctx.data_unchecked::<Storage>().lock().await;
@@ -43,7 +46,7 @@ impl QueryRoot {
 
 pub struct MutationRoot;
 
-#[async_graphql::Object]
+#[GQLObject]
 impl MutationRoot {
     async fn create_book(&self, ctx: &Context<'_>, name: String, author: String) -> ID {
         let mut books = ctx.data_unchecked::<Storage>().lock().await;
@@ -78,22 +81,38 @@ impl MutationRoot {
     }
 }
 
-#[async_graphql::Enum]
+#[derive(GQLEnum, Eq, PartialEq, Copy, Clone)]
 enum MutationType {
     Created,
     Deleted,
 }
 
-#[async_graphql::SimpleObject]
 #[derive(Clone)]
 struct BookChanged {
     mutation_type: MutationType,
     id: ID,
 }
 
+#[GQLObject]
+impl BookChanged {
+    async fn mutation_type(&self) -> MutationType {
+        self.mutation_type
+    }
+
+    async fn id(&self) -> &ID {
+        &self.id
+    }
+
+    async fn book(&self, ctx: &Context<'_>) -> FieldResult<Option<Book>> {
+        let books = ctx.data_unchecked::<Storage>().lock().await;
+        let id = self.id.parse::<usize>()?;
+        Ok(books.get(id).cloned())
+    }
+}
+
 pub struct SubscriptionRoot;
 
-#[async_graphql::Subscription]
+#[GQLSubscription]
 impl SubscriptionRoot {
     async fn interval(&self, #[arg(default = 1)] n: i32) -> impl Stream<Item = i32> {
         let mut value = 0;
