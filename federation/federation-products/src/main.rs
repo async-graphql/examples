@@ -1,5 +1,3 @@
-#![allow(clippy::needless_lifetimes)]
-
 use async_graphql::{
     Context, EmptyMutation, EmptySubscription, GQLObject, GQLSimpleObject, Schema,
 };

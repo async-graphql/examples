@@ -1,5 +1,3 @@
-#![allow(clippy::needless_lifetimes)]
-
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, GQLObject, Schema};
 use async_std::task;

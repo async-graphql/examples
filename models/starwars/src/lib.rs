@@ -1,5 +1,3 @@
-#![allow(clippy::needless_lifetimes)]
-
 mod model;
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};

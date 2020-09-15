@@ -5,5 +5,5 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "2.0.0-alpha.5"
+async-graphql = "2.0.0-alpha.7"
 slab = "0.4.2"
