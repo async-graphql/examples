@@ -1,17 +1,15 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{
-    Context, Data, EmptyMutation, FieldResult, GQLObject, GQLSubscription, Schema,
-};
-use async_graphql_warp::{graphql_subscription_with_initializer, GQLResponse};
+use async_graphql::{Context, Data, EmptyMutation, FieldResult, Object, Schema, Subscription};
+use async_graphql_warp::{graphql_subscription_with_data, Response};
 use futures::{stream, Stream};
 use std::convert::Infallible;
-use warp::{http::Response, Filter};
+use warp::{http::Response as HttpResponse, Filter};
 
 struct MyToken(String);
 
 struct QueryRoot;
 
-#[GQLObject]
+#[Object]
 impl QueryRoot {
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
@@ -20,7 +18,7 @@ impl QueryRoot {
 
 struct SubscriptionRoot;
 
-#[GQLSubscription]
+#[Subscription]
 impl SubscriptionRoot {
     async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
         if ctx.data_unchecked::<MyToken>().0 != "123456" {
@@ -48,32 +46,35 @@ async fn main() {
                     request = request.data(MyToken(token));
                 }
                 let resp = schema.execute(request).await;
-                Ok::<_, Infallible>(GQLResponse::from(resp))
+                Ok::<_, Infallible>(Response::from(resp))
             },
         );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
-        Response::builder()
+        HttpResponse::builder()
             .header("content-type", "text/html")
             .body(playground_source(
                 GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
             ))
     });
 
-    let routes = graphql_subscription_with_initializer(schema, |value| {
-        #[derive(serde_derive::Deserialize)]
-        struct Payload {
-            token: String,
-        }
+    let routes = graphql_subscription_with_data(
+        schema,
+        Some(|value| {
+            #[derive(serde_derive::Deserialize)]
+            struct Payload {
+                token: String,
+            }
 
-        if let Ok(payload) = serde_json::from_value::<Payload>(value) {
-            let mut data = Data::default();
-            data.insert(MyToken(payload.token));
-            Ok(data)
-        } else {
-            Err("Token is required".into())
-        }
-    })
+            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                let mut data = Data::default();
+                data.insert(MyToken(payload.token));
+                Ok(data)
+            } else {
+                Err("Token is required".into())
+            }
+        }),
+    )
     .or(graphql_playground)
     .or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;

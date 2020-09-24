@@ -1,11 +1,9 @@
-use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, GQLObject, GQLSimpleObject, Schema,
-};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
 use warp::{Filter, Reply};
 
-#[derive(GQLSimpleObject)]
+#[derive(SimpleObject)]
 struct Product {
     upc: String,
     name: String,
@@ -14,7 +12,7 @@ struct Product {
 
 struct Query;
 
-#[GQLObject(extends)]
+#[Object(extends)]
 impl Query {
     async fn top_products<'a>(&self, ctx: &'a Context<'_>) -> &'a Vec<Product> {
         ctx.data_unchecked::<Vec<Product>>()

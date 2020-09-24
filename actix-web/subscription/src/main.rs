@@ -2,10 +2,10 @@ use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::Schema;
-use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
+use async_graphql_actix_web::{Request, Response, WSSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
-async fn index(schema: web::Data<BooksSchema>, req: GQLRequest) -> GQLResponse {
+async fn index(schema: web::Data<BooksSchema>, req: Request) -> Response {
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -22,7 +22,12 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    ws::start_with_protocols(WSSubscription::new(&schema), &["graphql-ws"], &req, payload)
+    ws::start_with_protocols(
+        WSSubscription::new(Schema::clone(&*schema)),
+        &["graphql-ws"],
+        &req,
+        payload,
+    )
 }
 
 #[actix_rt::main]

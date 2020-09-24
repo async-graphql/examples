@@ -4,10 +4,10 @@ extern crate thiserror;
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, GQLObject,
-    ResultExt, Schema,
+    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
+    Schema,
 };
-use async_graphql_actix_web::{GQLRequest, GQLResponse};
+use async_graphql_actix_web::{Request, Response};
 use serde_json::json;
 
 #[derive(Debug, Error)]
@@ -39,7 +39,7 @@ impl ErrorExtensions for MyError {
 
 struct QueryRoot;
 
-#[GQLObject]
+#[Object]
 impl QueryRoot {
     // It works on foreign types without extensions as before
     async fn parse_without_extensions(&self) -> FieldResult<i32> {
@@ -99,8 +99,8 @@ impl QueryRoot {
 
 async fn index(
     schema: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
-    req: GQLRequest,
-) -> GQLResponse {
+    req: Request,
+) -> Response {
     schema.execute(req.into_inner()).await.into()
 }
 

@@ -1,9 +1,9 @@
-use async_graphql::{EmptyMutation, EmptySubscription, GQLObject, GQLSimpleObject, Schema, ID};
+use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
 use warp::{Filter, Reply};
 
-#[derive(GQLSimpleObject)]
+#[derive(SimpleObject)]
 struct User {
     id: ID,
     username: String,
@@ -11,7 +11,7 @@ struct User {
 
 struct Query;
 
-#[GQLObject(extends)]
+#[Object(extends)]
 impl Query {
     async fn me(&self) -> User {
         User {

@@ -1,10 +1,8 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{
-    Context, Data, EmptyMutation, FieldResult, GQLObject, GQLSubscription, Schema,
-};
-use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
+use async_graphql::{Context, Data, EmptyMutation, FieldResult, Object, Schema, Subscription};
+use async_graphql_actix_web::{Request, Response, WSSubscription};
 use futures::{stream, Stream};
 
 type MySchema = Schema<QueryRoot, EmptyMutation, SubscriptionRoot>;
@@ -13,7 +11,7 @@ struct MyToken(String);
 
 struct QueryRoot;
 
-#[GQLObject]
+#[Object]
 impl QueryRoot {
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
@@ -22,7 +20,7 @@ impl QueryRoot {
 
 struct SubscriptionRoot;
 
-#[GQLSubscription]
+#[Subscription]
 impl SubscriptionRoot {
     async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
         if ctx.data_unchecked::<MyToken>().0 != "123456" {
@@ -32,11 +30,7 @@ impl SubscriptionRoot {
     }
 }
 
-async fn index(
-    schema: web::Data<MySchema>,
-    req: HttpRequest,
-    gql_request: GQLRequest,
-) -> GQLResponse {
+async fn index(schema: web::Data<MySchema>, req: HttpRequest, gql_request: Request) -> Response {
     let token = req
         .headers()
         .get("Token")
@@ -62,7 +56,7 @@ async fn index_ws(
     payload: web::Payload,
 ) -> Result<HttpResponse> {
     ws::start_with_protocols(
-        WSSubscription::new(&schema).initializer(|value| {
+        WSSubscription::new(Schema::clone(&*schema)).initializer(|value| {
             #[derive(serde_derive::Deserialize)]
             struct Payload {
                 token: String,

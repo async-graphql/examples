@@ -1,6 +1,6 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, FieldResult, GQLObject, GQLSimpleObject, Schema,
+    Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema, SimpleObject,
 };
 use async_std::task;
 use async_trait::async_trait;
@@ -10,10 +10,10 @@ use sqlx::{sqlite::SqliteQueryAs, Pool, SqliteConnection};
 use std::collections::HashMap;
 use std::env;
 use std::result;
-use tide::{http::mime, Body, Request, Response, StatusCode};
+use tide::{http::mime, Body, Response, StatusCode};
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-#[derive(sqlx::FromRow, Clone, GQLSimpleObject)]
+#[derive(sqlx::FromRow, Clone, SimpleObject)]
 pub struct Book {
     id: i32,
     name: String,
@@ -87,7 +87,7 @@ impl BatchFn<i32, BookBatcherLoadHashMapValue> for BookBatcher {
 
 struct QueryRoot;
 
-#[GQLObject]
+#[Object]
 impl QueryRoot {
     async fn book(&self, ctx: &Context<'_>, id: i32) -> FieldResult<Option<Book>> {
         println!("pre load book by id {:?}", id);
@@ -145,15 +145,10 @@ async fn run() -> Result<()> {
         .data(book_loader)
         .finish();
 
-    let app_state = AppState { schema };
-    let mut app = tide::with_state(app_state);
+    let mut app = tide::new();
 
-    async fn graphql(req: Request<AppState>) -> tide::Result<Response> {
-        let schema = req.state().schema.clone();
-        async_graphql_tide::graphql(req, schema, |query_builder| query_builder).await
-    }
-
-    app.at("/graphql").post(graphql).get(graphql);
+    app.at("/graphql")
+        .post(async_graphql_tide::endpoint(schema));
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
         resp.set_body(Body::from_string(playground_source(

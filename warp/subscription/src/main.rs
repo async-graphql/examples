@@ -1,9 +1,9 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::Schema;
-use async_graphql_warp::{graphql_subscription, GQLResponse};
+use async_graphql_warp::{graphql_subscription, Response};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use std::convert::Infallible;
-use warp::{http::Response, Filter};
+use warp::{http::Response as HttpResponse, Filter};
 
 #[tokio::main]
 async fn main() {
@@ -17,11 +17,11 @@ async fn main() {
         |(schema, request): (
             Schema<QueryRoot, MutationRoot, SubscriptionRoot>,
             async_graphql::Request,
-        )| async move { Ok::<_, Infallible>(GQLResponse::from(schema.execute(request).await)) },
+        )| async move { Ok::<_, Infallible>(Response::from(schema.execute(request).await)) },
     );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
-        Response::builder()
+        HttpResponse::builder()
             .header("content-type", "text/html")
             .body(playground_source(
                 GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),

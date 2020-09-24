@@ -1,6 +1,4 @@
-use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, GQLObject, GQLSimpleObject, Schema, ID,
-};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
 use warp::{Filter, Reply};
@@ -9,7 +7,7 @@ struct User {
     id: ID,
 }
 
-#[GQLObject(extends)]
+#[Object(extends)]
 impl User {
     #[field(external)]
     async fn id(&self) -> &ID {
@@ -29,7 +27,7 @@ struct Product {
     upc: String,
 }
 
-#[GQLObject(extends)]
+#[Object(extends)]
 impl Product {
     #[field(external)]
     async fn upc(&self) -> &String {
@@ -45,7 +43,7 @@ impl Product {
     }
 }
 
-#[derive(GQLSimpleObject)]
+#[derive(SimpleObject)]
 struct Review {
     body: String,
     author: User,
@@ -54,7 +52,7 @@ struct Review {
 
 struct Query;
 
-#[GQLObject]
+#[Object]
 impl Query {
     #[entity]
     async fn find_user_by_id(&self, id: ID) -> User {

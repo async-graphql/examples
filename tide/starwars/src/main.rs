@@ -3,7 +3,7 @@ use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_std::task;
 use starwars::{QueryRoot, StarWars};
 use std::env;
-use tide::{http::mime, Body, Request, Response, StatusCode};
+use tide::{http::mime, Body, Response, StatusCode};
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[derive(Clone)]
@@ -24,15 +24,11 @@ async fn run() -> Result<()> {
 
     println!("Playground: http://{}", listen_addr);
 
-    let app_state = AppState { schema };
-    let mut app = tide::with_state(app_state);
+    let mut app = tide::new();
 
-    async fn graphql(req: Request<AppState>) -> tide::Result<Response> {
-        let schema = req.state().schema.clone();
-        async_graphql_tide::graphql(req, schema, |query_builder| query_builder).await
-    }
+    app.at("/graphql")
+        .post(async_graphql_tide::endpoint(schema));
 
-    app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
         resp.set_body(Body::from_string(playground_source(

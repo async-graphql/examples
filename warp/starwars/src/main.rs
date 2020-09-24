@@ -1,10 +1,10 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
-use async_graphql_warp::{BadRequest, GQLResponse};
+use async_graphql_warp::{BadRequest, Response};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
 use std::convert::Infallible;
-use warp::{http::Response, Filter, Rejection};
+use warp::{http::Response as HttpResponse, Filter, Rejection};
 
 #[tokio::main]
 async fn main() {
@@ -18,11 +18,11 @@ async fn main() {
         |(schema, request): (
             Schema<QueryRoot, EmptyMutation, EmptySubscription>,
             async_graphql::Request,
-        )| async move { Ok::<_, Infallible>(GQLResponse::from(schema.execute(request).await)) },
+        )| async move { Ok::<_, Infallible>(Response::from(schema.execute(request).await)) },
     );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
-        Response::builder()
+        HttpResponse::builder()
             .header("content-type", "text/html")
             .body(playground_source(GraphQLPlaygroundConfig::new("/")))
     });

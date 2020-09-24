@@ -1,5 +1,5 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, EmptyMutation, EmptySubscription, GQLObject, Schema};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema};
 use async_std::task;
 use std::env;
 use tide::{http::mime, Body, Request, Response, StatusCode};
@@ -9,7 +9,7 @@ struct MyToken(String);
 
 struct QueryRoot;
 
-#[GQLObject]
+#[Object]
 impl QueryRoot {
     async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
         ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
@@ -27,31 +27,28 @@ fn main() -> Result<()> {
 
 async fn run() -> Result<()> {
     let listen_addr = env::var("LISTEN_ADDR").unwrap_or_else(|_| "localhost:8000".to_owned());
-
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
 
     println!("Playground: http://{}", listen_addr);
 
-    let app_state = AppState { schema };
-    let mut app = tide::with_state(app_state);
+    let mut app = tide::new();
 
-    async fn graphql(req: Request<AppState>) -> tide::Result<Response> {
-        let schema = req.state().schema.clone();
-        let token = req
-            .header("token")
-            .and_then(|values| values.get(0))
-            .map(|value| value.as_str().to_string());
+    app.at("/graphql").post(move |req: Request<()>| {
+        let schema = schema.clone();
+        async move {
+            let token = req
+                .header("token")
+                .and_then(|values| values.get(0))
+                .map(|value| value.as_str().to_string());
 
-        async_graphql_tide::graphql(req, schema, |mut query_builder| {
-            if let Some(token) = &token {
-                query_builder = query_builder.data(MyToken(token.clone()));
+            let mut req = async_graphql_tide::receive_request(req).await?;
+            if let Some(token) = token {
+                req = req.data(MyToken(token.clone()));
             }
-            query_builder
-        })
-        .await
-    }
+            async_graphql_tide::respond(schema.execute(req).await)
+        }
+    });
 
-    app.at("/graphql").post(graphql).get(graphql);
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
         resp.set_body(Body::from_string(playground_source(
