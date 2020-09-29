@@ -20,7 +20,7 @@ impl Query {
         }
     }
 
-    #[entity]
+    #[graphql(entity)]
     async fn find_user_by_id(&self, id: ID) -> User {
         let username = if id == "1234" {
             "Me".to_string()

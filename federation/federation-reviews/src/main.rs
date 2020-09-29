@@ -9,7 +9,7 @@ struct User {
 
 #[Object(extends)]
 impl User {
-    #[field(external)]
+    #[graphql(external)]
     async fn id(&self) -> &ID {
         &self.id
     }
@@ -29,7 +29,7 @@ struct Product {
 
 #[Object(extends)]
 impl Product {
-    #[field(external)]
+    #[graphql(external)]
     async fn upc(&self) -> &String {
         &self.upc
     }
@@ -54,12 +54,12 @@ struct Query;
 
 #[Object]
 impl Query {
-    #[entity]
+    #[graphql(entity)]
     async fn find_user_by_id(&self, id: ID) -> User {
         User { id }
     }
 
-    #[entity]
+    #[graphql(entity)]
     async fn find_product_by_upc(&self, upc: String) -> Product {
         Product { upc }
     }

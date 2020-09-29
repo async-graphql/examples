@@ -18,7 +18,7 @@ impl Query {
         ctx.data_unchecked::<Vec<Product>>()
     }
 
-    #[entity]
+    #[graphql(entity)]
     async fn find_product_by_upc<'a>(
         &self,
         ctx: &'a Context<'_>,

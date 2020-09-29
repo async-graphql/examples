@@ -114,7 +114,7 @@ pub struct SubscriptionRoot;
 
 #[Subscription]
 impl SubscriptionRoot {
-    async fn interval(&self, #[arg(default = 1)] n: i32) -> impl Stream<Item = i32> {
+    async fn interval(&self, #[graphql(default = 1)] n: i32) -> impl Stream<Item = i32> {
         let mut value = 0;
         tokio::time::interval(Duration::from_secs(1)).map(move |_| {
             value += n;
