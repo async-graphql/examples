@@ -1,6 +1,6 @@
 use super::StarWars;
 use async_graphql::connection::{query, Connection, Edge, EmptyFields};
-use async_graphql::{Context, Enum, FieldResult, Interface, Object};
+use async_graphql::{Context, Enum, Interface, Object, Result};
 
 /// One of the films in the Star Wars Trilogy
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
@@ -119,7 +119,7 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> FieldResult<Connection<usize, Human, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<usize, Human, EmptyFields, EmptyFields>> {
         let humans = ctx
             .data_unchecked::<StarWars>()
             .humans()
@@ -146,7 +146,7 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> FieldResult<Connection<usize, Droid, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<usize, Droid, EmptyFields, EmptyFields>> {
         let droids = ctx
             .data_unchecked::<StarWars>()
             .droids()
@@ -177,7 +177,7 @@ async fn query_characters(
     first: Option<i32>,
     last: Option<i32>,
     characters: &[usize],
-) -> FieldResult<Connection<usize, usize, EmptyFields, EmptyFields>> {
+) -> Result<Connection<usize, usize, EmptyFields, EmptyFields>> {
     query(
         after,
         before,

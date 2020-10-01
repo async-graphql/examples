@@ -1,7 +1,7 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, Data, EmptyMutation, FieldResult, Object, Schema, Subscription};
+use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
 use async_graphql_actix_web::{Request, Response, WSSubscription};
 use futures::{stream, Stream};
 
@@ -22,7 +22,7 @@ struct SubscriptionRoot;
 
 #[Subscription]
 impl SubscriptionRoot {
-    async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
+    async fn values(&self, ctx: &Context<'_>) -> async_graphql::Result<impl Stream<Item = i32>> {
         if ctx.data_unchecked::<MyToken>().0 != "123456" {
             return Err("Forbidden".into());
         }

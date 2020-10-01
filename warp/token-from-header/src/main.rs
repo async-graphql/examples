@@ -1,5 +1,5 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Context, Data, EmptyMutation, FieldResult, Object, Schema, Subscription};
+use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
 use async_graphql_warp::{graphql_subscription_with_data, Response};
 use futures::{stream, Stream};
 use std::convert::Infallible;
@@ -20,7 +20,7 @@ struct SubscriptionRoot;
 
 #[Subscription]
 impl SubscriptionRoot {
-    async fn values(&self, ctx: &Context<'_>) -> FieldResult<impl Stream<Item = i32>> {
+    async fn values(&self, ctx: &Context<'_>) -> async_graphql::Result<impl Stream<Item = i32>> {
         if ctx.data_unchecked::<MyToken>().0 != "123456" {
             return Err("Forbidden".into());
         }

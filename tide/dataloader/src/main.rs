@@ -1,6 +1,6 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema, SimpleObject,
+    Context, EmptyMutation, EmptySubscription, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
 use async_trait::async_trait;
@@ -11,7 +11,6 @@ use std::collections::HashMap;
 use std::env;
 use std::result;
 use tide::{http::mime, Body, Response, StatusCode};
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
 pub struct Book {
@@ -89,7 +88,7 @@ struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn book(&self, ctx: &Context<'_>, id: i32) -> FieldResult<Option<Book>> {
+    async fn book(&self, ctx: &Context<'_>, id: i32) -> Result<Option<Book>> {
         println!("pre load book by id {:?}", id);
         match ctx
             .data_unchecked::<Loader<i32, BookBatcherLoadHashMapValue, BookBatcher>>()

@@ -4,8 +4,8 @@ extern crate thiserror;
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
-    Schema,
+    EmptyMutation, EmptySubscription, Error as FieldError, ErrorExtensions, Object,
+    Result as FieldResult, ResultExt, Schema,
 };
 use async_graphql_actix_web::{Request, Response};
 use serde_json::json;
@@ -25,15 +25,13 @@ pub enum MyError {
 impl ErrorExtensions for MyError {
     // lets define our base extensions
     fn extend(&self) -> FieldError {
-        let extensions = match self {
+        self.extend_with(|err| match err {
             MyError::NotFound => json!({"code": "NOT_FOUND"}),
             MyError::ServerError(reason) => json!({ "reason": reason }),
             MyError::ErrorWithoutExtensions => {
                 json!("This will be ignored since it does not represent an object.")
             }
-        };
-
-        FieldError(format!("{}", self), Some(extensions))
+        })
     }
 }
 

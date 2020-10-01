@@ -1,6 +1,6 @@
 mod simple_broker;
 
-use async_graphql::{Context, Enum, FieldResult, Object, Schema, Subscription, ID};
+use async_graphql::{Context, Enum, Object, Result, Schema, Subscription, ID};
 use futures::lock::Mutex;
 use futures::{Stream, StreamExt};
 use simple_broker::SimpleBroker;
@@ -65,7 +65,7 @@ impl MutationRoot {
         id
     }
 
-    async fn delete_book(&self, ctx: &Context<'_>, id: ID) -> FieldResult<bool> {
+    async fn delete_book(&self, ctx: &Context<'_>, id: ID) -> Result<bool> {
         let mut books = ctx.data_unchecked::<Storage>().lock().await;
         let id = id.parse::<usize>()?;
         if books.contains(id) {
@@ -103,7 +103,7 @@ impl BookChanged {
         &self.id
     }
 
-    async fn book(&self, ctx: &Context<'_>) -> FieldResult<Option<Book>> {
+    async fn book(&self, ctx: &Context<'_>) -> Result<Option<Book>> {
         let books = ctx.data_unchecked::<Storage>().lock().await;
         let id = self.id.parse::<usize>()?;
         Ok(books.get(id).cloned())
