@@ -5,8 +5,8 @@ authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "2.0.0-alpha.23"
-async-graphql-tide = "2.0.0-alpha.23"
+async-graphql = "2.0.0-alpha.24"
+async-graphql-tide = "2.0.0-alpha.24"
 tide = "0.13"
 async-std = "1.5.0"
 starwars = { path = "../../models/starwars" }

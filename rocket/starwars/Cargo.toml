@@ -5,7 +5,7 @@ authors = ["Daniel Wiesenberg <daniel@simplificAR.io>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "2.0.0-alpha.23"
-async-graphql-rocket = "2.0.0-alpha.23"
+async-graphql = "2.0.0-alpha.24"
+async-graphql-rocket = "2.0.0-alpha.24"
 rocket = { git = "https://github.com/SergioBenitez/Rocket/", rev = "dc2c6ec", default-features = false } #TODO: Change to Cargo crate, when Rocket 0.5.0 is released
 starwars = { path = "../../models/starwars" }

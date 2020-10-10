@@ -8,7 +8,6 @@ use async_graphql::{
     Result as FieldResult, ResultExt, Schema,
 };
 use async_graphql_actix_web::{Request, Response};
-use serde_json::json;
 
 #[derive(Debug, Error)]
 pub enum MyError {
@@ -25,12 +24,10 @@ pub enum MyError {
 impl ErrorExtensions for MyError {
     // lets define our base extensions
     fn extend(&self) -> FieldError {
-        self.extend_with(|err| match err {
-            MyError::NotFound => json!({"code": "NOT_FOUND"}),
-            MyError::ServerError(reason) => json!({ "reason": reason }),
-            MyError::ErrorWithoutExtensions => {
-                json!("This will be ignored since it does not represent an object.")
-            }
+        self.extend_with(|err, e| match err {
+            MyError::NotFound => e.set("code", "NOT_FOUND"),
+            MyError::ServerError(reason) => e.set("reason", reason.to_string()),
+            MyError::ErrorWithoutExtensions => {}
         })
     }
 }
@@ -48,7 +45,7 @@ impl QueryRoot {
     async fn parse_with_extensions(&self) -> FieldResult<i32> {
         Ok("234a"
             .parse()
-            .map_err(|e: std::num::ParseIntError| e.extend_with(|_| json!({"code": 404})))?)
+            .map_err(|e: std::num::ParseIntError| e.extend_with(|_, e| e.set("code", 404)))?)
     }
 
     // THIS does unfortunately NOT work because ErrorExtensions is implemented for &E and not E.
@@ -71,27 +68,27 @@ impl QueryRoot {
     // Base extensions can be further extended
     async fn more_extensions(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
-        Err(MyError::NotFound.extend_with(|_e| json!({"reason": "my reason"})))
+        Err(MyError::NotFound.extend_with(|_e, e| e.set("reason", "my reason")))
     }
 
     // works with results as well
     async fn more_extensions_on_result(&self) -> FieldResult<String> {
         // resolves to extensions: { "code": "NOT_FOUND", "reason": "my reason" }
-        Err(MyError::NotFound).extend_err(|_e| json!({"reason": "my reason"}))
+        Err(MyError::NotFound).extend_err(|_e, e| e.set("reason", "my reason"))
     }
 
     // extend_with is chainable
     async fn chainable_extensions(&self) -> FieldResult<String> {
         let err = MyError::NotFound
-            .extend_with(|_| json!({"ext1": 1}))
-            .extend_with(|_| json!({"ext2": 2}))
-            .extend_with(|_| json!({"ext3": 3}));
+            .extend_with(|_, e| e.set("ext1", 1))
+            .extend_with(|_, e| e.set("ext2", 2))
+            .extend_with(|_, e| e.set("ext3", 3));
         Err(err)
     }
 
     // extend_with overwrites keys which are already present
     async fn overwrite(&self) -> FieldResult<String> {
-        Err(MyError::NotFound.extend_with(|_| json!({"code": "overwritten"})))
+        Err(MyError::NotFound.extend_with(|_, e| e.set("code", "overwritten")))
     }
 }
 

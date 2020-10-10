@@ -5,7 +5,7 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "2.0.0-alpha.23"
-async-graphql-warp = "2.0.0-alpha.23"
+async-graphql = "2.0.0-alpha.24"
+async-graphql-warp = "2.0.0-alpha.24"
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"

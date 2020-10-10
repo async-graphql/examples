@@ -31,10 +31,11 @@ impl MutationRoot {
         let mut storage = ctx.data_unchecked::<Storage>().lock().await;
         println!("files count: {}", storage.len());
         let entry = storage.vacant_entry();
+        let upload = file.value(ctx).unwrap();
         let info = FileInfo {
             id: entry.key().into(),
-            filename: file.filename().to_string(),
-            mimetype: file.content_type().map(ToString::to_string),
+            filename: upload.filename.clone(),
+            mimetype: upload.content_type.clone(),
         };
         entry.insert(info.clone());
         info
@@ -45,10 +46,11 @@ impl MutationRoot {
         let mut storage = ctx.data_unchecked::<Storage>().lock().await;
         for file in files {
             let entry = storage.vacant_entry();
+            let upload = file.value(ctx).unwrap();
             let info = FileInfo {
                 id: entry.key().into(),
-                filename: file.filename().to_string(),
-                mimetype: file.content_type().map(ToString::to_string),
+                filename: upload.filename.clone(),
+                mimetype: upload.content_type.clone(),
             };
             entry.insert(info.clone());
             infos.push(info)
