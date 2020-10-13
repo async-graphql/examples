@@ -4,8 +4,8 @@ extern crate thiserror;
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    EmptyMutation, EmptySubscription, Error as FieldError, ErrorExtensions, Object,
-    Result as FieldResult, ResultExt, Schema,
+    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
+    Schema,
 };
 use async_graphql_actix_web::{Request, Response};
 
