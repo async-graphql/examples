@@ -35,7 +35,7 @@ impl MutationRoot {
         let info = FileInfo {
             id: entry.key().into(),
             filename: upload.filename.clone(),
-            mimetype: upload.content_type.clone(),
+            mimetype: upload.content_type,
         };
         entry.insert(info.clone());
         info

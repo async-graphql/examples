@@ -43,7 +43,7 @@ async fn run() -> Result<()> {
 
             let mut req = async_graphql_tide::receive_request(req).await?;
             if let Some(token) = token {
-                req = req.data(MyToken(token.clone()));
+                req = req.data(MyToken(token));
             }
             async_graphql_tide::respond(schema.execute(req).await)
         }

@@ -5,7 +5,7 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = "2.0.0"
-async-graphql-warp = "2.0.0"
-tokio = { version = "0.2", features = ["macros"] }
+async-graphql = { path = "../../..", version = "2.0.0" }
+async-graphql-warp = { path = "../../../integrations/warp", version = "2.0.0" }
+tokio = { version = "0.3.0", features = ["macros", "rt-multi-thread"] }
 warp = "0.2"
