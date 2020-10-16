@@ -5,8 +5,8 @@ authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-async-graphql = { path = "../../..", version = "2.0.0" }
-async-graphql-tide = { path = "../../../integrations/tide", version = "2.0.0" }
+async-graphql = { path = "../../.." }
+async-graphql-tide = { path = "../../../integrations/tide" }
 tide = "0.13"
 async-std = "1.5.0"
 dataloader = "0.12.0"
