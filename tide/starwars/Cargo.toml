@@ -1,6 +1,6 @@
 [package]
 name = "tide-starwars"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"
 
