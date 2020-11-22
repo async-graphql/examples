@@ -3,6 +3,7 @@ use async_graphql::Schema;
 use async_graphql_warp::{graphql_subscription, Response};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use std::convert::Infallible;
+use tokio_compat_02::FutureExt;
 use warp::{http::Response as HttpResponse, Filter};
 
 #[tokio::main]
@@ -31,5 +32,5 @@ async fn main() {
     let routes = graphql_subscription(schema)
         .or(graphql_playground)
         .or(graphql_post);
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], 8000)).compat().await;
 }

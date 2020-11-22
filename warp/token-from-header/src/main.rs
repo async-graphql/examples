@@ -3,6 +3,7 @@ use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
 use async_graphql_warp::{graphql_subscription_with_data, Response};
 use futures::{stream, Stream};
 use std::convert::Infallible;
+use tokio_compat_02::FutureExt;
 use warp::{http::Response as HttpResponse, Filter};
 
 struct MyToken(String);
@@ -77,5 +78,5 @@ async fn main() {
     )
     .or(graphql_playground)
     .or(graphql_post);
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], 8000)).compat().await;
 }

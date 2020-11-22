@@ -8,5 +8,6 @@ edition = "2018"
 async-graphql = { path = "../../.." }
 async-graphql-warp = { path = "../../../integrations/warp" }
 tokio = { version = "0.3.0", features = ["macros", "rt-multi-thread"] }
+tokio-compat-02 = "0.1.2"
 warp = "0.2"
 books = { path = "../../models/books" }
