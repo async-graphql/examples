@@ -1,6 +1,7 @@
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject};
 use async_graphql_warp::graphql;
 use std::convert::Infallible;
+use tokio_compat_02::FutureExt;
 use warp::{Filter, Reply};
 
 #[derive(SimpleObject)]
@@ -62,5 +63,6 @@ async fn main() {
         },
     ))
     .run(([0, 0, 0, 0], 4002))
+    .compat()
     .await;
 }
