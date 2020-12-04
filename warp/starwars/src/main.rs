@@ -4,7 +4,6 @@ use async_graphql_warp::{BadRequest, Response};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
 use std::convert::Infallible;
-use tokio_compat_02::FutureExt;
 use warp::{http::Response as HttpResponse, Filter, Rejection};
 
 #[tokio::main]
@@ -44,5 +43,5 @@ async fn main() {
             ))
         });
 
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).compat().await;
+    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }

@@ -1,5 +1,4 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
-use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
 use async_graphql_actix_web::{Request, Response, WSSubscription};
@@ -55,25 +54,20 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    ws::start_with_protocols(
-        WSSubscription::new(Schema::clone(&*schema)).initializer(|value| {
-            #[derive(serde_derive::Deserialize)]
-            struct Payload {
-                token: String,
-            }
+    WSSubscription::start_with_initializer(Schema::clone(&*schema), &req, payload, |value| {
+        #[derive(serde_derive::Deserialize)]
+        struct Payload {
+            token: String,
+        }
 
-            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
-                let mut data = Data::default();
-                data.insert(MyToken(payload.token));
-                Ok(data)
-            } else {
-                Err("Token is required".into())
-            }
-        }),
-        &["graphql-ws"],
-        &req,
-        payload,
-    )
+        if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+            let mut data = Data::default();
+            data.insert(MyToken(payload.token));
+            Ok(data)
+        } else {
+            Err("Token is required".into())
+        }
+    })
 }
 
 #[actix_rt::main]

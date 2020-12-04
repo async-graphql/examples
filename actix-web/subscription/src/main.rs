@@ -1,5 +1,4 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
-use actix_web_actors::ws;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::Schema;
 use async_graphql_actix_web::{Request, Response, WSSubscription};
@@ -22,12 +21,7 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    ws::start_with_protocols(
-        WSSubscription::new(Schema::clone(&*schema)),
-        &["graphql-ws"],
-        &req,
-        payload,
-    )
+    WSSubscription::start(Schema::clone(&*schema), &req, payload)
 }
 
 #[actix_rt::main]
