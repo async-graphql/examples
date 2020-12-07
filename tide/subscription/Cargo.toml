@@ -1,0 +1,12 @@
+[package]
+name = "tide-subscription"
+version = "0.1.0"
+authors = ["Sunli <scott_s829@163.com>"]
+edition = "2018"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-tide = { path = "../../../integrations/tide", features = ["unstable"] }
+books = { path = "../../models/books" }
+tide = "0.15"
+async-std = "1.5.0"

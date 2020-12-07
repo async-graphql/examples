@@ -4,6 +4,7 @@ use async_std::task;
 use starwars::{QueryRoot, StarWars};
 use std::env;
 use tide::{http::mime, Body, Response, StatusCode};
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[derive(Clone)]

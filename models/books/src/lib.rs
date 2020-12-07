@@ -6,7 +6,6 @@ use futures::{Stream, StreamExt};
 use simple_broker::SimpleBroker;
 use slab::Slab;
 use std::sync::Arc;
-use std::time::Duration;
 
 pub type BooksSchema = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
@@ -114,14 +113,6 @@ pub struct SubscriptionRoot;
 
 #[Subscription]
 impl SubscriptionRoot {
-    async fn interval(&self, #[graphql(default = 1)] n: i32) -> impl Stream<Item = i32> {
-        let mut value = 0;
-        tokio::time::interval(Duration::from_secs(1)).map(move |_| {
-            value += n;
-            value
-        })
-    }
-
     async fn books(&self, mutation_type: Option<MutationType>) -> impl Stream<Item = BookChanged> {
         SimpleBroker::<BookChanged>::subscribe().filter(move |event| {
             let res = if let Some(mutation_type) = mutation_type {
