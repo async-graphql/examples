@@ -1,15 +1,14 @@
+use async_graphql::dataloader::{DataLoader, Loader};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
     Context, EmptyMutation, EmptySubscription, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
 use async_trait::async_trait;
-use dataloader::cached::Loader;
-use dataloader::BatchFn;
 use sqlx::{sqlite::SqliteQueryAs, Pool, SqliteConnection};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
-use std::result;
+use std::sync::Arc;
 use tide::{http::mime, Body, Response, StatusCode};
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
@@ -19,35 +18,31 @@ pub struct Book {
     author: String,
 }
 
-#[derive(Clone)]
-enum BatchFnLoadError {
-    NotFound,
-    DBError(String),
-}
+pub struct BookLoader(Pool<SqliteConnection>);
 
-pub struct BookBatcher(Pool<SqliteConnection>);
-impl BookBatcher {
+impl BookLoader {
     fn new(sqlite_pool: Pool<SqliteConnection>) -> Self {
         Self(sqlite_pool)
     }
 }
-type BookBatcherLoadHashMapValue = result::Result<Book, BatchFnLoadError>;
 
 #[async_trait]
-impl BatchFn<i32, BookBatcherLoadHashMapValue> for BookBatcher {
-    async fn load(&self, keys: &[i32]) -> HashMap<i32, BookBatcherLoadHashMapValue> {
+impl Loader for BookLoader {
+    type Key = i32;
+    type Value = Book;
+    type Error = Arc<sqlx::Error>;
+
+    async fn load(
+        &self,
+        keys: HashSet<Self::Key>,
+    ) -> Result<HashMap<Self::Key, Self::Value>, Self::Error> {
         println!("load book by batch {:?}", keys);
 
         if keys.contains(&9) {
-            return keys
-                .iter()
-                .map(|k| {
-                    (
-                        *k,
-                        Err(BatchFnLoadError::DBError("MOCK DBError".to_owned())),
-                    )
-                })
-                .collect();
+            return Err(Arc::new(sqlx::Error::Io(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "MOCK DBError",
+            ))));
         }
 
         let stmt = format!(
@@ -58,29 +53,12 @@ impl BatchFn<i32, BookBatcherLoadHashMapValue> for BookBatcher {
                 .join(",")
         );
 
-        let books: result::Result<Vec<Book>, sqlx::Error> = keys
+        let books: Vec<Book> = keys
             .iter()
             .fold(sqlx::query_as(&stmt), |q, key| q.bind(key))
             .fetch_all(&self.0)
-            .await;
-
-        match books {
-            Ok(books) => {
-                let books_map = books.into_iter().map(|book| (book.id, Ok(book))).collect();
-
-                keys.iter().fold(
-                    books_map,
-                    |mut map: HashMap<i32, BookBatcherLoadHashMapValue>, key| {
-                        map.entry(*key).or_insert(Err(BatchFnLoadError::NotFound));
-                        map
-                    },
-                )
-            }
-            Err(e) => keys
-                .iter()
-                .map(|k| (*k, Err(BatchFnLoadError::DBError(e.to_string()))))
-                .collect(),
-        }
+            .await?;
+        Ok(books.into_iter().map(|book| (book.id, book)).collect())
     }
 }
 
@@ -90,17 +68,10 @@ struct QueryRoot;
 impl QueryRoot {
     async fn book(&self, ctx: &Context<'_>, id: i32) -> Result<Option<Book>> {
         println!("pre load book by id {:?}", id);
-        match ctx
-            .data_unchecked::<Loader<i32, BookBatcherLoadHashMapValue, BookBatcher>>()
-            .load(id)
-            .await
-        {
-            Ok(book) => Ok(Some(book)),
-            Err(err) => match err {
-                BatchFnLoadError::NotFound => Ok(None),
-                BatchFnLoadError::DBError(db_err) => Err(db_err.into()),
-            },
-        }
+        Ok(ctx
+            .data_unchecked::<DataLoader<BookLoader>>()
+            .load_one(id)
+            .await?)
     }
 }
 
@@ -138,10 +109,8 @@ async fn run() -> Result<()> {
     .execute(&sqlite_pool)
     .await?;
 
-    let book_loader = Loader::new(BookBatcher::new(sqlite_pool));
-
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
-        .data(book_loader)
+        .data(DataLoader::new(BookLoader::new(sqlite_pool)))
         .finish();
 
     let mut app = tide::new();
