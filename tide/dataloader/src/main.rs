@@ -1,14 +1,14 @@
 use async_graphql::dataloader::{DataLoader, Loader};
+use async_graphql::futures_util::TryStreamExt;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
-    Context, EmptyMutation, EmptySubscription, Object, Result, Schema, SimpleObject,
+    Context, EmptyMutation, EmptySubscription, FieldError, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
 use async_trait::async_trait;
-use sqlx::{sqlite::SqliteQueryAs, Pool, SqliteConnection};
+use itertools::Itertools;
+use sqlx::{Pool, Sqlite};
 use std::collections::{HashMap, HashSet};
-use std::env;
-use std::sync::Arc;
 use tide::{http::mime, Body, Response, StatusCode};
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
@@ -18,10 +18,10 @@ pub struct Book {
     author: String,
 }
 
-pub struct BookLoader(Pool<SqliteConnection>);
+pub struct BookLoader(Pool<Sqlite>);
 
 impl BookLoader {
-    fn new(sqlite_pool: Pool<SqliteConnection>) -> Self {
+    fn new(sqlite_pool: Pool<Sqlite>) -> Self {
         Self(sqlite_pool)
     }
 }
@@ -30,7 +30,7 @@ impl BookLoader {
 impl Loader for BookLoader {
     type Key = i32;
     type Value = Book;
-    type Error = Arc<sqlx::Error>;
+    type Error = FieldError;
 
     async fn load(
         &self,
@@ -39,26 +39,18 @@ impl Loader for BookLoader {
         println!("load book by batch {:?}", keys);
 
         if keys.contains(&9) {
-            return Err(Arc::new(sqlx::Error::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "MOCK DBError",
-            ))));
+            return Err("MOCK DBError".into());
         }
 
-        let stmt = format!(
-            r#"SELECT id, name, author FROM books WHERE id in ({})"#,
-            (0..keys.len())
-                .map(|i| format!("${}", i + 1))
-                .collect::<Vec<String>>()
-                .join(",")
+        let query = format!(
+            "SELECT id, name, author FROM books WHERE id IN ({})",
+            keys.iter().join(",")
         );
-
-        let books: Vec<Book> = keys
-            .iter()
-            .fold(sqlx::query_as(&stmt), |q, key| q.bind(key))
-            .fetch_all(&self.0)
-            .await?;
-        Ok(books.into_iter().map(|book| (book.id, book)).collect())
+        Ok(sqlx::query_as(&query)
+            .fetch(&self.0)
+            .map_ok(|book: Book| (book.id, book))
+            .try_collect()
+            .await?)
     }
 }
 
@@ -85,7 +77,7 @@ fn main() -> Result<()> {
 }
 
 async fn run() -> Result<()> {
-    let sqlite_pool: Pool<SqliteConnection> = Pool::new("sqlite::memory:").await?;
+    let sqlite_pool: Pool<Sqlite> = Pool::connect("sqlite::memory:").await?;
 
     sqlx::query(
         r#"
@@ -126,9 +118,8 @@ async fn run() -> Result<()> {
         Ok(resp)
     });
 
-    let listen_addr = env::var("LISTEN_ADDR").unwrap_or_else(|_| "localhost:8000".to_owned());
-    println!("Playground: http://{}", listen_addr);
-    app.listen(listen_addr).await?;
+    println!("Playground: http://127.0.0.1:8000");
+    app.listen("127.0.0.1:8000").await?;
 
     Ok(())
 }
@@ -143,22 +134,16 @@ mod tests {
     #[test]
     fn sample() -> Result<()> {
         task::block_on(async {
-            let listen_addr = find_listen_addr().await;
-            env::set_var("LISTEN_ADDR", format!("{}", listen_addr));
-
             let server: task::JoinHandle<Result<()>> = task::spawn(async move {
                 run().await?;
-
                 Ok(())
             });
 
             let client: task::JoinHandle<Result<()>> = task::spawn(async move {
-                let listen_addr = env::var("LISTEN_ADDR").unwrap();
-
-                task::sleep(Duration::from_millis(300)).await;
+                task::sleep(Duration::from_millis(1000)).await;
 
                 //
-                let string = surf::post(format!("http://{}/graphql", listen_addr))
+                let string = surf::post("http://127.0.0.1:8000/graphql")
                     .body(
                         Body::from(r#"{"query":"{ book1: book(id: 1) {id, name, author} book2: book(id: 2) {id, name, author} book3: book(id: 3) {id, name, author} book4: book(id: 4) {id, name, author} }"}"#),
                     )
@@ -183,7 +168,7 @@ mod tests {
                 assert_eq!(v["data"]["book4"], json!(null));
 
                 //
-                let string = surf::post(format!("http://{}/graphql", listen_addr))
+                let string = surf::post(    "http://127.0.0.1:8000/graphql")
                     .body(
                         Body::from(r#"{"query":"{ book1: book(id: 1) {id, name, author} book4: book(id: 4) {id, name, author} book9: book(id: 9) {id, name, author} }"}"#),
                     )
@@ -195,7 +180,6 @@ mod tests {
                 let v: Value = serde_json::from_str(&string)?;
                 let error = v["errors"].as_array().unwrap()[0].clone();
                 assert_eq!(error["message"], json!("MOCK DBError"));
-                assert_eq!(error["path"].to_string(), r#"["book9"]"#);
 
                 Ok(())
             });
@@ -204,13 +188,5 @@ mod tests {
 
             Ok(())
         })
-    }
-
-    async fn find_listen_addr() -> async_std::net::SocketAddr {
-        async_std::net::TcpListener::bind("localhost:0")
-            .await
-            .unwrap()
-            .local_addr()
-            .unwrap()
     }
 }
