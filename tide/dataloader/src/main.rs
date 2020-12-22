@@ -8,7 +8,7 @@ use async_std::task;
 use async_trait::async_trait;
 use itertools::Itertools;
 use sqlx::{Pool, Sqlite};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use tide::{http::mime, Body, Response, StatusCode};
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
@@ -27,15 +27,11 @@ impl BookLoader {
 }
 
 #[async_trait]
-impl Loader for BookLoader {
-    type Key = i32;
+impl Loader<i32> for BookLoader {
     type Value = Book;
     type Error = FieldError;
 
-    async fn load(
-        &self,
-        keys: HashSet<Self::Key>,
-    ) -> Result<HashMap<Self::Key, Self::Value>, Self::Error> {
+    async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
         println!("load book by batch {:?}", keys);
 
         if keys.contains(&9) {
