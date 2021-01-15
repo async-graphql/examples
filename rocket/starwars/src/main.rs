@@ -10,15 +10,15 @@ pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
 #[rocket::get("/")]
 fn graphql_playground() -> content::Html<String> {
-    content::Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+    content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
-#[rocket::post("/?<query..>")]
+#[rocket::get("/graphql?<query..>")]
 async fn graphql_query(schema: State<'_, StarWarsSchema>, query: Request) -> Response {
     query.execute(&schema).await
 }
 
-#[rocket::post("/", data = "<request>", format = "application/json")]
+#[rocket::post("/graphql", data = "<request>", format = "application/json")]
 async fn graphql_request(schema: State<'_, StarWarsSchema>, request: Request) -> Response {
     request.execute(&schema).await
 }
