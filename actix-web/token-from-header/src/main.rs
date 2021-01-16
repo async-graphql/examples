@@ -54,7 +54,7 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    WSSubscription::start_with_initializer(Schema::clone(&*schema), &req, payload, |value| {
+    WSSubscription::start_with_initializer(Schema::clone(&*schema), &req, payload, |value| async {
         #[derive(serde_derive::Deserialize)]
         struct Payload {
             token: String,

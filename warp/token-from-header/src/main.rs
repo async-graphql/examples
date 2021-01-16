@@ -60,7 +60,7 @@ async fn main() {
 
     let routes = graphql_subscription_with_data(
         schema,
-        Some(|value| {
+        |value| async {
             #[derive(serde_derive::Deserialize)]
             struct Payload {
                 token: String,
@@ -73,7 +73,7 @@ async fn main() {
             } else {
                 Err("Token is required".into())
             }
-        }),
+        },
     )
     .or(graphql_playground)
     .or(graphql_post);
