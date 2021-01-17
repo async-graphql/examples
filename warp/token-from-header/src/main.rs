@@ -58,23 +58,20 @@ async fn main() {
             ))
     });
 
-    let routes = graphql_subscription_with_data(
-        schema,
-        |value| async {
-            #[derive(serde_derive::Deserialize)]
-            struct Payload {
-                token: String,
-            }
+    let routes = graphql_subscription_with_data(schema, |value| async {
+        #[derive(serde_derive::Deserialize)]
+        struct Payload {
+            token: String,
+        }
 
-            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
-                let mut data = Data::default();
-                data.insert(MyToken(payload.token));
-                Ok(data)
-            } else {
-                Err("Token is required".into())
-            }
-        },
-    )
+        if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+            let mut data = Data::default();
+            data.insert(MyToken(payload.token));
+            Ok(data)
+        } else {
+            Err("Token is required".into())
+        }
+    })
     .or(graphql_playground)
     .or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
