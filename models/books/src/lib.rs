@@ -116,10 +116,13 @@ pub struct SubscriptionRoot;
 impl SubscriptionRoot {
     async fn interval(&self, #[graphql(default = 1)] n: i32) -> impl Stream<Item = i32> {
         let mut value = 0;
-        tokio::time::interval(Duration::from_secs(1)).map(move |_| {
-            value += n;
-            value
-        })
+        async_stream::stream! {
+            loop {
+                futures_timer::Delay::new(Duration::from_secs(1)).await;
+                value += n;
+                yield value;
+            }
+        }
     }
 
     async fn books(&self, mutation_type: Option<MutationType>) -> impl Stream<Item = BookChanged> {
