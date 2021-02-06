@@ -22,6 +22,7 @@ members = [
     "tide/token-from-header",
     "tide/dataloader",
     "tide/dataloader-postgres",
+    "tide/subscription",
 
     "rocket/starwars",
 ]

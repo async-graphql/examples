@@ -22,7 +22,7 @@ struct SubscriptionRoot;
 #[Subscription]
 impl SubscriptionRoot {
     async fn values(&self, ctx: &Context<'_>) -> async_graphql::Result<impl Stream<Item = i32>> {
-        if ctx.data_unchecked::<MyToken>().0 != "123456" {
+        if ctx.data::<MyToken>()?.0 != "123456" {
             return Err("Forbidden".into());
         }
         Ok(stream::once(async move { 10 }))
