@@ -7,5 +7,5 @@ edition = "2018"
 [dependencies]
 async-graphql = { path = "../../..", version = "2.0.3" }
 async-graphql-rocket = { path = "../../../integrations/rocket", version = "2.0.3" }
-rocket = { git = "https://github.com/SergioBenitez/Rocket/", rev = "48fd83a", default-features = false } # TODO: Change to Cargo crate when Rocket 0.5.0 is released
+rocket = { git = "https://github.com/SergioBenitez/Rocket/", rev = "2893ce7", default-features = false } # TODO: Change to Cargo crate when Rocket 0.5.0 is released
 starwars = { path = "../../models/starwars" }
