@@ -2,7 +2,7 @@ use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptyMutation, EmptySubscription, Schema,
 };
-use async_graphql_rocket::{Request, Response};
+use async_graphql_rocket::{Query, Request, Response};
 use rocket::{response::content, routes, State};
 use starwars::{QueryRoot, StarWars};
 
@@ -14,7 +14,7 @@ fn graphql_playground() -> content::Html<String> {
 }
 
 #[rocket::get("/graphql?<query..>")]
-async fn graphql_query(schema: State<'_, StarWarsSchema>, query: Request) -> Response {
+async fn graphql_query(schema: State<'_, StarWarsSchema>, query: Query) -> Response {
     query.execute(&schema).await
 }
 
