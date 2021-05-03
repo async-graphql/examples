@@ -41,7 +41,7 @@ impl StarWars {
 
         let vader = chars.insert(StarWarsChar {
             id: "1001",
-            name: "Luke Skywalker",
+            name: "Anakin Skywalker",
             friends: vec![],
             appears_in: vec![],
             home_planet: Some("Tatooine"),
