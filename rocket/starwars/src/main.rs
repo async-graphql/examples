@@ -14,22 +14,22 @@ fn graphql_playground() -> content::Html<String> {
 }
 
 #[rocket::get("/graphql?<query..>")]
-async fn graphql_query(schema: State<'_, StarWarsSchema>, query: Query) -> Response {
-    query.execute(&schema).await
+async fn graphql_query(schema: &State<StarWarsSchema>, query: Query) -> Response {
+    query.execute(schema).await
 }
 
 #[rocket::post("/graphql", data = "<request>", format = "application/json")]
-async fn graphql_request(schema: State<'_, StarWarsSchema>, request: Request) -> Response {
-    request.execute(&schema).await
+async fn graphql_request(schema: &State<StarWarsSchema>, request: Request) -> Response {
+    request.execute(schema).await
 }
 
 #[rocket::launch]
-fn rocket() -> rocket::Rocket {
+fn rocket() -> _ {
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(StarWars::new())
         .finish();
 
-    rocket::ignite().manage(schema).mount(
+    rocket::build().manage(schema).mount(
         "/",
         routes![graphql_query, graphql_request, graphql_playground],
     )

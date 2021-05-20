@@ -1,0 +1,41 @@
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
+use async_graphql_rocket::{Query, Request, Response};
+use rocket::{response::content, routes, State};
+use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
+
+pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
+
+#[rocket::get("/")]
+fn graphql_playground() -> content::Html<String> {
+    content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+}
+
+#[rocket::get("/graphql?<query..>")]
+async fn graphql_query(schema: &State<FilesSchema>, query: Query) -> Response {
+    query.execute(schema).await
+}
+
+#[rocket::post("/graphql", data = "<request>", format = "application/json", rank = 1)]
+async fn graphql_request(schema: &State<FilesSchema>, request: Request) -> Response {
+    request.execute(schema).await
+}
+
+#[rocket::post("/graphql", data = "<request>", format = "multipart/form-data", rank = 2)]
+async fn graphql_request_multipart(schema: &State<FilesSchema>, request: Request) -> Response {
+    request.execute(schema).await
+}
+
+#[rocket::launch]
+fn rocket() -> _ {
+    let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
+        .data(Storage::default())
+        .finish();
+
+    rocket::build().manage(schema).mount(
+        "/",
+        routes![graphql_query, graphql_request, graphql_request_multipart, graphql_playground],
+    )
+}
