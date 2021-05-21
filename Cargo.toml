@@ -25,4 +25,5 @@ members = [
     "tide/subscription",
 
     "rocket/starwars",
+    "rocket/upload",
 ]
