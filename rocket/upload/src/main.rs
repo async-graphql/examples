@@ -3,8 +3,8 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, Schema,
 };
 use async_graphql_rocket::{Query, Request, Response};
-use rocket::{response::content, routes, State};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
+use rocket::{response::content, routes, State};
 
 pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
@@ -23,7 +23,12 @@ async fn graphql_request(schema: &State<FilesSchema>, request: Request) -> Respo
     request.execute(schema).await
 }
 
-#[rocket::post("/graphql", data = "<request>", format = "multipart/form-data", rank = 2)]
+#[rocket::post(
+    "/graphql",
+    data = "<request>",
+    format = "multipart/form-data",
+    rank = 2
+)]
 async fn graphql_request_multipart(schema: &State<FilesSchema>, request: Request) -> Response {
     request.execute(schema).await
 }
@@ -36,6 +41,11 @@ fn rocket() -> _ {
 
     rocket::build().manage(schema).mount(
         "/",
-        routes![graphql_query, graphql_request, graphql_request_multipart, graphql_playground],
+        routes![
+            graphql_query,
+            graphql_request,
+            graphql_request_multipart,
+            graphql_playground
+        ],
     )
 }
