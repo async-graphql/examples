@@ -7,6 +7,5 @@ edition = "2018"
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-actix-web = { path = "../../../integrations/actix-web" }
-actix-web = "3.0.0"
-actix-rt = "1.1.0"
+actix-web = { version = "4.0.0-beta.8", default-features = false }
 starwars = { path = "../../models/starwars" }
