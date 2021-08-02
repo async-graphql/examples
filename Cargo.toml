@@ -26,4 +26,7 @@ members = [
 
     "rocket/starwars",
     "rocket/upload",
+
+    "axum/starwars",
+    "axum/subscription",
 ]
