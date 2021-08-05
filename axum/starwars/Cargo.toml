@@ -9,5 +9,4 @@ async-graphql-axum = { path = "../../../integrations/axum" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 starwars = { path = "../../models/starwars" }
 hyper = "0.14"
-#axum = "0.1.2"
-axum = { git = "https://github.com/sunli829/axum.git", rev = "f43470a", features = ["ws", "headers"] }
+axum = { git = "https://github.com/tokio-rs/axum.git", rev = "1509d4a", features = ["headers"] }
