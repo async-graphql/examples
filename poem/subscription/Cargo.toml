@@ -1,0 +1,11 @@
+[package]
+name = "poem-subscription"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-poem = { path = "../../../integrations/poem" }
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+books = { path = "../../models/books" }
+poem = { version = "0.3.6", features = ["websocket"] }

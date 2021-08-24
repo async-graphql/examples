@@ -4,6 +4,9 @@ members = [
     "models/books",
     "models/files",
 
+    "poem/starwars",
+    "poem/subscription",
+
     "actix-web/token-from-header",
     "actix-web/subscription",
     "actix-web/upload",

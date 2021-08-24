@@ -1,0 +1,11 @@
+[package]
+name = "poem-starwars"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-poem = { path = "../../../integrations/poem" }
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+starwars = { path = "../../models/starwars" }
+poem = "0.3.6"
