@@ -3,9 +3,9 @@ use async_graphql::Schema;
 use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use poem::web::Html;
-use poem::{handler, route, EndpointExt, IntoResponse, Server};
+use poem::{handler, route, IntoResponse, Server};
 
-#[handler(method = "get")]
+#[handler]
 async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(
         GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
@@ -18,9 +18,12 @@ async fn main() {
         .data(Storage::default())
         .finish();
 
-    let app = route()
-        .at("/", graphql_playground.or(GraphQL::new(schema.clone())))
-        .at("/ws", GraphQLSubscription::new(schema));
+    let mut app = route();
+
+    app.at("/")
+        .get(graphql_playground)
+        .post(GraphQL::new(schema.clone()));
+    app.at("/ws").get(GraphQLSubscription::new(schema));
 
     println!("Playground: http://localhost:8000");
 
