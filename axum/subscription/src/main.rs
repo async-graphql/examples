@@ -3,12 +3,11 @@ use async_graphql::Schema;
 use async_graphql_axum::{
     graphql_subscription, GraphQLRequest, GraphQLResponse, SecWebsocketProtocol,
 };
-use axum::extract::TypedHeader;
-use axum::response::IntoResponse;
-use axum::ws::{ws, WebSocket};
-use axum::{prelude::*, AddExtensionLayer};
+use axum::extract::{self, ws::WebSocketUpgrade, TypedHeader};
+use axum::handler::get;
+use axum::response::{self, IntoResponse};
+use axum::{AddExtensionLayer, Router, Server};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use hyper::http::HeaderValue;
 
 async fn graphql_handler(
     schema: extract::Extension<BooksSchema>,
@@ -18,11 +17,14 @@ async fn graphql_handler(
 }
 
 async fn graphql_subscription_handler(
-    socket: WebSocket,
+    ws: WebSocketUpgrade,
     schema: extract::Extension<BooksSchema>,
     protocol: TypedHeader<SecWebsocketProtocol>,
-) {
-    graphql_subscription(socket, schema.0.clone(), protocol.0).await
+) -> impl IntoResponse {
+    ws.protocols(ALL_WEBSOCKET_PROTOCOLS)
+        .on_upgrade(move |socket| async move {
+            graphql_subscription(socket, schema.0.clone(), protocol.0.clone()).await
+        })
 }
 
 async fn graphql_playground() -> impl IntoResponse {
@@ -35,16 +37,14 @@ async fn main() {
         .data(Storage::default())
         .finish();
 
-    let app = route("/", get(graphql_playground).post(graphql_handler))
-        .route(
-            "/ws",
-            ws(graphql_subscription_handler).protocols(ALL_WEBSOCKET_PROTOCOLS),
-        )
+    let app = Router::new()
+        .route("/", get(graphql_playground).post(graphql_handler))
+        .route("/ws", get(graphql_subscription_handler))
         .layer(AddExtensionLayer::new(schema));
 
     println!("Playground: http://localhost:8000");
 
-    hyper::Server::bind(&"0.0.0.0:8000".parse().unwrap())
+    Server::bind(&"0.0.0.0:8000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
