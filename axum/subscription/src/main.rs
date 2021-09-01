@@ -28,7 +28,9 @@ async fn graphql_subscription_handler(
 }
 
 async fn graphql_playground() -> impl IntoResponse {
-    response::Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+    response::Html(playground_source(
+        GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
+    ))
 }
 
 #[tokio::main]
