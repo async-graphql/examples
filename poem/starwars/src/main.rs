@@ -1,6 +1,7 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_poem::GraphQL;
+use poem::listener::TcpListener;
 use poem::route::RouteMethod;
 use poem::web::Html;
 use poem::{handler, route, IntoResponse, Server};
@@ -26,10 +27,6 @@ async fn main() {
 
     println!("Playground: http://localhost:8000");
 
-    Server::bind("0.0.0.0:8000")
-        .await
-        .unwrap()
-        .run(app)
-        .await
-        .unwrap();
+    let listener = TcpListener::bind("0.0.0.0:8000");
+    Server::new(listener).await.unwrap().run(app).await.unwrap();
 }
