@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(schema.clone())
+            .app_data(web::Data::new(schema.clone()))
             .service(
                 web::resource("/")
                     .guard(guard::Post())

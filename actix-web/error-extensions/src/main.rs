@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_web::{guard, web, App, HttpResponse, HttpServer};
+use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{
     EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
@@ -111,7 +111,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(Schema::new(QueryRoot, EmptyMutation, EmptySubscription))
+            .app_data(Data::new(Schema::new(QueryRoot, EmptyMutation, EmptySubscription)))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
