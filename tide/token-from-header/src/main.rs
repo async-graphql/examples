@@ -31,11 +31,6 @@ impl SubscriptionRoot {
     }
 }
 
-#[derive(Clone)]
-struct AppState {
-    schema: Schema<QueryRoot, EmptyMutation, SubscriptionRoot>,
-}
-
 fn main() -> Result<()> {
     task::block_on(run())
 }

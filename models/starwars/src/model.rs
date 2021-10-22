@@ -1,4 +1,5 @@
 use super::StarWars;
+use crate::StarWarsChar;
 use async_graphql::connection::{query, Connection, Edge, EmptyFields};
 use async_graphql::{Context, Enum, Interface, Object, Result};
 
@@ -15,73 +16,87 @@ pub enum Episode {
     Jedi,
 }
 
-pub struct Human(usize);
+pub struct Human<'a>(&'a StarWarsChar);
 
 /// A humanoid creature in the Star Wars universe.
 #[Object]
-impl Human {
+impl<'a> Human<'a> {
     /// The id of the human.
-    async fn id(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].id
+    async fn id(&self) -> &str {
+        self.0.id
     }
 
     /// The name of the human.
-    async fn name(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].name
+    async fn name(&self) -> &str {
+        self.0.name
     }
 
     /// The friends of the human, or an empty list if they have none.
-    async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
-        ctx.data_unchecked::<StarWars>().chars[self.0]
-            .friends
-            .iter()
-            .map(|id| Human(*id).into())
+    async fn friends<'ctx>(&self, ctx: &Context<'ctx>) -> Vec<Character<'ctx>> {
+        let star_wars = ctx.data_unchecked::<StarWars>();
+        star_wars
+            .friends(self.0)
+            .into_iter()
+            .map(|ch| {
+                if ch.is_human {
+                    Human(ch).into()
+                } else {
+                    Droid(ch).into()
+                }
+            })
             .collect()
     }
 
     /// Which movies they appear in.
-    async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].appears_in
+    async fn appears_in(&self) -> &[Episode] {
+        &self.0.appears_in
     }
 
     /// The home planet of the human, or null if unknown.
-    async fn home_planet<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].home_planet
+    async fn home_planet(&self) -> &Option<&str> {
+        &self.0.home_planet
     }
 }
 
-pub struct Droid(usize);
+pub struct Droid<'a>(&'a StarWarsChar);
 
 /// A mechanical creature in the Star Wars universe.
 #[Object]
-impl Droid {
+impl<'a> Droid<'a> {
     /// The id of the droid.
-    async fn id(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].id
+    async fn id(&self) -> &str {
+        self.0.id
     }
 
     /// The name of the droid.
-    async fn name(&self, ctx: &Context<'_>) -> &str {
-        ctx.data_unchecked::<StarWars>().chars[self.0].name
+    async fn name(&self) -> &str {
+        self.0.name
     }
 
     /// The friends of the droid, or an empty list if they have none.
-    async fn friends(&self, ctx: &Context<'_>) -> Vec<Character> {
-        ctx.data_unchecked::<StarWars>().chars[self.0]
-            .friends
-            .iter()
-            .map(|id| Droid(*id).into())
+    async fn friends<'ctx>(&self, ctx: &Context<'ctx>) -> Vec<Character<'ctx>> {
+        let star_wars = ctx.data_unchecked::<StarWars>();
+        star_wars
+            .friends(self.0)
+            .into_iter()
+            .map(|ch| {
+                if ch.is_human {
+                    Human(ch).into()
+                } else {
+                    Droid(ch).into()
+                }
+            })
             .collect()
     }
 
     /// Which movies they appear in.
-    async fn appears_in<'a>(&self, ctx: &'a Context<'_>) -> &'a [Episode] {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].appears_in
+    async fn appears_in(&self) -> &[Episode] {
+        &self.0.appears_in
     }
 
     /// The primary function of the droid.
-    async fn primary_function<'a>(&self, ctx: &'a Context<'_>) -> &'a Option<&'a str> {
-        &ctx.data_unchecked::<StarWars>().chars[self.0].primary_function
+    async fn primary_function(&self) -> &Option<&str> {
+        &self.0.primary_function
     }
 }
 
@@ -89,37 +104,38 @@ pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn hero(
+    async fn hero<'a>(
         &self,
-        ctx: &Context<'_>,
+        ctx: &Context<'a>,
         #[graphql(
             desc = "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."
         )]
         episode: Episode,
-    ) -> Character {
+    ) -> Character<'a> {
+        let star_wars = ctx.data_unchecked::<StarWars>();
         if episode == Episode::Empire {
-            Human(ctx.data_unchecked::<StarWars>().luke).into()
+            Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
         } else {
-            Droid(ctx.data_unchecked::<StarWars>().artoo).into()
+            Droid(star_wars.chars.get(star_wars.artoo).unwrap()).into()
         }
     }
 
-    async fn human(
+    async fn human<'a>(
         &self,
-        ctx: &Context<'_>,
+        ctx: &Context<'a>,
         #[graphql(desc = "id of the human")] id: String,
-    ) -> Option<Human> {
+    ) -> Option<Human<'a>> {
         ctx.data_unchecked::<StarWars>().human(&id).map(Human)
     }
 
-    async fn humans(
+    async fn humans<'a>(
         &self,
-        ctx: &Context<'_>,
+        ctx: &Context<'a>,
         after: Option<String>,
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<usize, Human, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<usize, Human<'a>, EmptyFields, EmptyFields>> {
         let humans = ctx
             .data_unchecked::<StarWars>()
             .humans()
@@ -131,22 +147,22 @@ impl QueryRoot {
             .map(|conn| conn.map_node(Human))
     }
 
-    async fn droid(
+    async fn droid<'a>(
         &self,
-        ctx: &Context<'_>,
+        ctx: &Context<'a>,
         #[graphql(desc = "id of the droid")] id: String,
-    ) -> Option<Droid> {
+    ) -> Option<Droid<'a>> {
         ctx.data_unchecked::<StarWars>().droid(&id).map(Droid)
     }
 
-    async fn droids(
+    async fn droids<'a>(
         &self,
-        ctx: &Context<'_>,
+        ctx: &Context<'a>,
         after: Option<String>,
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<usize, Droid, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<usize, Droid<'a>, EmptyFields, EmptyFields>> {
         let droids = ctx
             .data_unchecked::<StarWars>()
             .droids()
@@ -163,21 +179,21 @@ impl QueryRoot {
 #[graphql(
     field(name = "id", type = "&str"),
     field(name = "name", type = "&str"),
-    field(name = "friends", type = "Vec<Character>"),
-    field(name = "appears_in", type = "&'ctx [Episode]")
+    field(name = "friends", type = "Vec<Character<'ctx>>"),
+    field(name = "appears_in", type = "&[Episode]")
 )]
-pub enum Character {
-    Human(Human),
-    Droid(Droid),
+pub enum Character<'a> {
+    Human(Human<'a>),
+    Droid(Droid<'a>),
 }
 
-async fn query_characters(
+async fn query_characters<'a>(
     after: Option<String>,
     before: Option<String>,
     first: Option<i32>,
     last: Option<i32>,
-    characters: &[usize],
-) -> Result<Connection<usize, usize, EmptyFields, EmptyFields>> {
+    characters: &[&'a StarWarsChar],
+) -> Result<Connection<usize, &'a StarWarsChar, EmptyFields, EmptyFields>> {
     query(
         after,
         before,

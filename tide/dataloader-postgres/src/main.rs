@@ -64,11 +64,6 @@ impl QueryRoot {
     }
 }
 
-#[derive(Clone)]
-struct AppState {
-    schema: Schema<QueryRoot, EmptyMutation, EmptySubscription>,
-}
-
 fn main() -> Result<()> {
     task::block_on(run())
 }
