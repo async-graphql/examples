@@ -4,7 +4,7 @@ use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use poem::listener::TcpListener;
 use poem::web::Html;
-use poem::{handler, route, IntoResponse, RouteMethod, Server};
+use poem::{get, handler, IntoResponse, Route, Server};
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {
@@ -19,17 +19,12 @@ async fn main() {
         .data(Storage::default())
         .finish();
 
-    let app = route()
+    let app = Route::new()
         .at(
             "/",
-            RouteMethod::new()
-                .get(graphql_playground)
-                .post(GraphQL::new(schema.clone())),
+            get(graphql_playground).post(GraphQL::new(schema.clone())),
         )
-        .at(
-            "/ws",
-            RouteMethod::new().get(GraphQLSubscription::new(schema)),
-        );
+        .at("/ws", get(GraphQLSubscription::new(schema)));
 
     println!("Playground: http://localhost:8000");
 

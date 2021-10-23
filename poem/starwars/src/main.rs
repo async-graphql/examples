@@ -2,9 +2,8 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_poem::GraphQL;
 use poem::listener::TcpListener;
-use poem::route::RouteMethod;
 use poem::web::Html;
-use poem::{handler, route, IntoResponse, Server};
+use poem::{get, handler, IntoResponse, Route, Server};
 use starwars::{QueryRoot, StarWars};
 
 #[handler]
@@ -18,12 +17,7 @@ async fn main() {
         .data(StarWars::new())
         .finish();
 
-    let app = route().at(
-        "/",
-        RouteMethod::new()
-            .get(graphql_playground)
-            .post(GraphQL::new(schema)),
-    );
+    let app = Route::new().at("/", get(graphql_playground).post(GraphQL::new(schema)));
 
     println!("Playground: http://localhost:8000");
 

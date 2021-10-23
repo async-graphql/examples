@@ -23,7 +23,7 @@ async fn graphql_subscription_handler(
 ) -> impl IntoResponse {
     ws.protocols(ALL_WEBSOCKET_PROTOCOLS)
         .on_upgrade(move |socket| async move {
-            graphql_subscription(socket, schema.0.clone(), protocol.0.clone()).await
+            graphql_subscription(socket, schema.0.clone(), protocol.0).await
         })
 }
 
