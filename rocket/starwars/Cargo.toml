@@ -2,7 +2,7 @@
 name = "rocket-starwars"
 version = "0.1.1"
 authors = ["Daniel Wiesenberg <daniel@simplificAR.io>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 async-graphql = { path = "../../.." }

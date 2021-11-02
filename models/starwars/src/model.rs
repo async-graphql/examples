@@ -1,3 +1,5 @@
+#![allow(clippy::needless_lifetimes)]
+
 use super::StarWars;
 use crate::StarWarsChar;
 use async_graphql::connection::{query, Connection, Edge, EmptyFields};
