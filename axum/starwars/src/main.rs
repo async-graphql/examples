@@ -2,8 +2,8 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::extract::Extension;
-use axum::handler::get;
 use axum::response::{self, IntoResponse};
+use axum::routing::{get, post};
 use axum::{AddExtensionLayer, Router, Server};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 

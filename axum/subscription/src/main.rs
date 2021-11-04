@@ -4,8 +4,8 @@ use async_graphql_axum::{
     graphql_subscription, GraphQLRequest, GraphQLResponse, SecWebsocketProtocol,
 };
 use axum::extract::{self, ws::WebSocketUpgrade, TypedHeader};
-use axum::handler::get;
 use axum::response::{self, IntoResponse};
+use axum::routing::get;
 use axum::{AddExtensionLayer, Router, Server};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
