@@ -1,3 +1,4 @@
+use actix_web::web::Data;
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::Schema;
@@ -24,7 +25,7 @@ async fn index_ws(
     WSSubscription::start(Schema::clone(&*schema), &req, payload)
 }
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let schema = Schema::build(QueryRoot, MutationRoot, SubscriptionRoot)
         .data(Storage::default())
@@ -34,7 +35,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(schema.clone())
+            .app_data(Data::new(schema.clone()))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(
                 web::resource("/")

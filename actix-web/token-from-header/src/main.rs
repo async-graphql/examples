@@ -70,7 +70,7 @@ async fn index_ws(
     })
 }
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let schema = Schema::new(QueryRoot, EmptyMutation, SubscriptionRoot);
 
@@ -78,7 +78,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(schema.clone())
+            .app_data(Data::new(schema.clone()))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(
                 web::resource("/")
