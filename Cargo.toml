@@ -3,9 +3,11 @@ members = [
     "models/starwars",
     "models/books",
     "models/files",
+    "models/token",
 
     "poem/starwars",
     "poem/subscription",
+    "poem/token-from-header",
 
     "actix-web/token-from-header",
     "actix-web/subscription",

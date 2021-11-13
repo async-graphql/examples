@@ -1,8 +1,8 @@
 mod simple_broker;
 
 use async_graphql::{Context, Enum, Object, Result, Schema, Subscription, ID};
-use futures::lock::Mutex;
-use futures::{Stream, StreamExt};
+use futures_util::lock::Mutex;
+use futures_util::{Stream, StreamExt};
 use simple_broker::SimpleBroker;
 use slab::Slab;
 use std::sync::Arc;

@@ -1,0 +1,11 @@
+[package]
+name = "poem-token-from-header"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-poem = { path = "../../../integrations/poem" }
+token = { path = "../../models/token" }
+poem = { version = "1.0.19", features = ["websocket"] }
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
