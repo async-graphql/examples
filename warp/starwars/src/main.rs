@@ -1,6 +1,6 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
-use async_graphql_warp::{BadRequest, Response};
+use async_graphql_warp::{GraphQLBadRequest, GraphQLResponse};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
 use std::convert::Infallible;
@@ -18,7 +18,9 @@ async fn main() {
         |(schema, request): (
             Schema<QueryRoot, EmptyMutation, EmptySubscription>,
             async_graphql::Request,
-        )| async move { Ok::<_, Infallible>(Response::from(schema.execute(request).await)) },
+        )| async move {
+            Ok::<_, Infallible>(GraphQLResponse::from(schema.execute(request).await))
+        },
     );
 
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
@@ -30,7 +32,7 @@ async fn main() {
     let routes = graphql_playground
         .or(graphql_post)
         .recover(|err: Rejection| async move {
-            if let Some(BadRequest(err)) = err.find() {
+            if let Some(GraphQLBadRequest(err)) = err.find() {
                 return Ok::<_, Infallible>(warp::reply::with_status(
                     err.to_string(),
                     StatusCode::BAD_REQUEST,

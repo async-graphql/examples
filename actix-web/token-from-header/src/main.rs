@@ -1,7 +1,7 @@
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
-use async_graphql_actix_web::{Request, Response, WSSubscription};
+use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use futures::{stream, Stream};
 
 type MySchema = Schema<QueryRoot, EmptyMutation, SubscriptionRoot>;
@@ -29,7 +29,11 @@ impl SubscriptionRoot {
     }
 }
 
-async fn index(schema: web::Data<MySchema>, req: HttpRequest, gql_request: Request) -> Response {
+async fn index(
+    schema: web::Data<MySchema>,
+    req: HttpRequest,
+    gql_request: GraphQLRequest,
+) -> GraphQLResponse {
     let token = req
         .headers()
         .get("Token")
@@ -54,20 +58,22 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    WSSubscription::start_with_initializer(Schema::clone(&*schema), &req, payload, |value| async {
-        #[derive(serde_derive::Deserialize)]
-        struct Payload {
-            token: String,
-        }
+    GraphQLSubscription::new(Schema::clone(&*schema))
+        .on_connection_init(|value| async {
+            #[derive(serde_derive::Deserialize)]
+            struct Payload {
+                token: String,
+            }
 
-        if let Ok(payload) = serde_json::from_value::<Payload>(value) {
-            let mut data = Data::default();
-            data.insert(MyToken(payload.token));
-            Ok(data)
-        } else {
-            Err("Token is required".into())
-        }
-    })
+            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                let mut data = Data::default();
+                data.insert(MyToken(payload.token));
+                Ok(data)
+            } else {
+                Err("Token is required".into())
+            }
+        })
+        .start(&req, payload)
 }
 
 #[actix_web::main]
@@ -78,7 +84,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(schema.clone()))
+            .app_data(web::Data::new(schema.clone()))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(
                 web::resource("/")

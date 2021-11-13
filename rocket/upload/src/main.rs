@@ -2,7 +2,7 @@ use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptyMutation, EmptySubscription, Schema,
 };
-use async_graphql_rocket::{Query, Request, Response};
+use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use rocket::{response::content, routes, State};
 
@@ -14,12 +14,12 @@ fn graphql_playground() -> content::Html<String> {
 }
 
 #[rocket::get("/graphql?<query..>")]
-async fn graphql_query(schema: &State<FilesSchema>, query: Query) -> Response {
+async fn graphql_query(schema: &State<FilesSchema>, query: GraphQLQuery) -> GraphQLResponse {
     query.execute(schema).await
 }
 
 #[rocket::post("/graphql", data = "<request>", format = "application/json", rank = 1)]
-async fn graphql_request(schema: &State<FilesSchema>, request: Request) -> Response {
+async fn graphql_request(schema: &State<FilesSchema>, request: GraphQLRequest) -> GraphQLResponse {
     request.execute(schema).await
 }
 
@@ -29,7 +29,10 @@ async fn graphql_request(schema: &State<FilesSchema>, request: Request) -> Respo
     format = "multipart/form-data",
     rank = 2
 )]
-async fn graphql_request_multipart(schema: &State<FilesSchema>, request: Request) -> Response {
+async fn graphql_request_multipart(
+    schema: &State<FilesSchema>,
+    request: GraphQLRequest,
+) -> GraphQLResponse {
     request.execute(schema).await
 }
 

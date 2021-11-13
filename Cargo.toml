@@ -21,12 +21,6 @@ members = [
     "federation/federation-products",
     "federation/federation-reviews",
 
-    "tide/starwars",
-    "tide/token-from-header",
-    "tide/dataloader",
-    "tide/dataloader-postgres",
-    "tide/subscription",
-
     "rocket/starwars",
     "rocket/upload",
 

@@ -1,8 +1,9 @@
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Context, Data, EmptyMutation, Object, Schema, Subscription};
-use async_graphql_warp::{graphql_subscription_with_data, Response};
+use async_graphql_warp::{graphql_protocol, GraphQLResponse, GraphQLWebSocket};
 use futures::{stream, Stream};
 use std::convert::Infallible;
+use warp::ws::Ws;
 use warp::{http::Response as HttpResponse, Filter};
 
 struct MyToken(String);
@@ -46,7 +47,7 @@ async fn main() {
                     request = request.data(MyToken(token));
                 }
                 let resp = schema.execute(request).await;
-                Ok::<_, Infallible>(Response::from(resp))
+                Ok::<_, Infallible>(GraphQLResponse::from(resp))
             },
         );
 
@@ -58,21 +59,38 @@ async fn main() {
             ))
     });
 
-    let routes = graphql_subscription_with_data(schema, |value| async {
-        #[derive(serde_derive::Deserialize)]
-        struct Payload {
-            token: String,
-        }
+    let subscription = warp::ws()
+        .and(warp::any().map(move || schema.clone()))
+        .and(graphql_protocol())
+        .map(
+            move |ws: Ws, schema: Schema<QueryRoot, EmptyMutation, SubscriptionRoot>, protocol| {
+                let reply = ws.on_upgrade(move |socket| {
+                    GraphQLWebSocket::new(socket, schema, protocol)
+                        .on_connection_init(|value| async {
+                            #[derive(serde_derive::Deserialize)]
+                            struct Payload {
+                                token: String,
+                            }
 
-        if let Ok(payload) = serde_json::from_value::<Payload>(value) {
-            let mut data = Data::default();
-            data.insert(MyToken(payload.token));
-            Ok(data)
-        } else {
-            Err("Token is required".into())
-        }
-    })
-    .or(graphql_playground)
-    .or(graphql_post);
+                            if let Ok(payload) = serde_json::from_value::<Payload>(value) {
+                                let mut data = Data::default();
+                                data.insert(MyToken(payload.token));
+                                Ok(data)
+                            } else {
+                                Err("Token is required".into())
+                            }
+                        })
+                        .serve()
+                });
+
+                warp::reply::with_header(
+                    reply,
+                    "Sec-WebSocket-Protocol",
+                    protocol.sec_websocket_protocol(),
+                )
+            },
+        );
+
+    let routes = subscription.or(graphql_playground).or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }

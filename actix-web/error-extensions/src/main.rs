@@ -8,7 +8,7 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
     Schema,
 };
-use async_graphql_actix_web::{Request, Response};
+use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
 #[derive(Debug, Error)]
 pub enum MyError {
@@ -95,8 +95,8 @@ impl QueryRoot {
 
 async fn index(
     schema: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
-    req: Request,
-) -> Response {
+    req: GraphQLRequest,
+) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
