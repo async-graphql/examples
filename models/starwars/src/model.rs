@@ -3,7 +3,7 @@
 use super::StarWars;
 use crate::StarWarsChar;
 use async_graphql::connection::{query, Connection, Edge, EmptyFields};
-use async_graphql::{Context, Enum, Interface, Object, Result};
+use async_graphql::{Context, Enum, Error, Interface, Object, Result};
 
 /// One of the films in the Star Wars Trilogy
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
@@ -236,7 +236,7 @@ async fn query_characters<'a>(
                     .enumerate()
                     .map(|(idx, item)| Edge::new(start + idx, *item)),
             );
-            Ok(connection)
+            Ok::<_, Error>(connection)
         },
     )
     .await
