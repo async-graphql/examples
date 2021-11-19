@@ -28,4 +28,9 @@ members = [
 
     "axum/starwars",
     "axum/subscription",
+
+    "tide/starwars",
+    "tide/dataloader",
+    "tide/dataloader-postgres",
+    "tide/subscription",
 ]
