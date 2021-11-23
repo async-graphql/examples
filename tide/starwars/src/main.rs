@@ -4,12 +4,8 @@ use async_std::task;
 use starwars::{QueryRoot, StarWars};
 use std::env;
 use tide::{http::mime, Body, Response, StatusCode};
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-#[derive(Clone)]
-struct AppState {
-    schema: Schema<QueryRoot, EmptyMutation, EmptySubscription>,
-}
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn main() -> Result<()> {
     task::block_on(run())

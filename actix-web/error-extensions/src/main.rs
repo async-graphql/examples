@@ -24,7 +24,7 @@ pub enum MyError {
 
 impl ErrorExtensions for MyError {
     // lets define our base extensions
-    fn extend(self) -> FieldError {
+    fn extend(&self) -> FieldError {
         self.extend_with(|err, e| match err {
             MyError::NotFound => e.set("code", "NOT_FOUND"),
             MyError::ServerError(reason) => e.set("reason", reason.to_string()),
