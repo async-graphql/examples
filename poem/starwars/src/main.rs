@@ -20,7 +20,8 @@ async fn main() {
     let app = Route::new().at("/", get(graphql_playground).post(GraphQL::new(schema)));
 
     println!("Playground: http://localhost:8000");
-
-    let listener = TcpListener::bind("0.0.0.0:8000");
-    Server::new(listener).await.unwrap().run(app).await.unwrap();
+    Server::new(TcpListener::bind("0.0.0.0:8000"))
+        .run(app)
+        .await
+        .unwrap();
 }
