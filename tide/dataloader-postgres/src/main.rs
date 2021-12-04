@@ -95,7 +95,10 @@ async fn run() -> Result<()> {
     .await?;
 
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
-        .data(DataLoader::new(BookLoader::new(postgres_pool)))
+        .data(DataLoader::new(
+            BookLoader::new(postgres_pool),
+            async_std::task::spawn,
+        ))
         .finish();
 
     let mut app = tide::new();

@@ -93,7 +93,10 @@ async fn run() -> Result<()> {
     .await?;
 
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
-        .data(DataLoader::new(BookLoader::new(sqlite_pool)))
+        .data(DataLoader::new(
+            BookLoader::new(sqlite_pool),
+            async_std::task::spawn,
+        ))
         .finish();
 
     let mut app = tide::new();
