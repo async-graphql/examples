@@ -9,4 +9,4 @@ async-graphql-axum = { path = "../../../integrations/axum" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 books = { path = "../../models/books" }
 hyper = "0.14"
-axum = { version = "0.3", features = ["ws", "headers"] }
+axum = { version = "0.4", features = ["ws", "headers"] }
