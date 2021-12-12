@@ -1,4 +1,4 @@
-use actix_web::http::HeaderMap;
+use actix_web::http::header::HeaderMap;
 use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql::{Data, EmptyMutation, Schema};
