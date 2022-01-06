@@ -1,5 +1,5 @@
 [package]
-name = "poem-starwars"
+name = "subscription-redis"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,6 @@ edition = "2021"
 async-graphql = { path = "../../.." }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
-starwars = { path = "../../models/starwars" }
-poem = "1.2.25"
+poem = { version = "1.2.25", features = ["websocket"] }
+redis = { version = "0.21.4", features = ["aio", "tokio-comp"] }
+futures-util = "0.3.19"
