@@ -1,0 +1,12 @@
+[package]
+name = "poem-upload"
+version = "0.1.1"
+authors = ["sunli <scott_s829@163.com>"]
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-poem = { path = "../../../integrations/poem" }
+poem = { version = "1.2.25", features = ["websocket"] }
+files = { path = "../../models/files" }
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }

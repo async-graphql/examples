@@ -7,8 +7,7 @@ pub type FilesSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 #[derive(Clone, SimpleObject)]
 pub struct FileInfo {
     id: ID,
-    filename: String,
-    mimetype: Option<String>,
+    url: String,
 }
 
 pub type Storage = Mutex<Slab<FileInfo>>;
@@ -34,8 +33,7 @@ impl MutationRoot {
         let upload = file.value(ctx).unwrap();
         let info = FileInfo {
             id: entry.key().into(),
-            filename: upload.filename.clone(),
-            mimetype: upload.content_type,
+            url: upload.filename,
         };
         entry.insert(info.clone());
         info
@@ -49,8 +47,7 @@ impl MutationRoot {
             let upload = file.value(ctx).unwrap();
             let info = FileInfo {
                 id: entry.key().into(),
-                filename: upload.filename.clone(),
-                mimetype: upload.content_type.clone(),
+                url: upload.filename.clone(),
             };
             entry.insert(info.clone());
             infos.push(info)

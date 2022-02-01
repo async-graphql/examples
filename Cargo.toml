@@ -9,6 +9,7 @@ members = [
     "poem/subscription",
     "poem/subscription-redis",
     "poem/token-from-header",
+    "poem/upload",
 
     "actix-web/token-from-header",
     "actix-web/subscription",
@@ -29,6 +30,7 @@ members = [
 
     "axum/starwars",
     "axum/subscription",
+    "axum/upload",
 
     "tide/starwars",
     "tide/dataloader",

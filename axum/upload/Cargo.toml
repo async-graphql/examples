@@ -1,0 +1,14 @@
+[package]
+name = "axum-upload"
+version = "0.1.1"
+authors = ["sunli <scott_s829@163.com>"]
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+async-graphql-axum = { path = "../../../integrations/axum" }
+axum = "0.4"
+files = { path = "../../models/files" }
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+hyper = "0.14"
+tower-http = { version = "0.2.1", features = ["cors"] }
