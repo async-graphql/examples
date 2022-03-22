@@ -4,7 +4,7 @@ use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::extract::Extension;
 use axum::response::{self, IntoResponse};
 use axum::routing::get;
-use axum::{AddExtensionLayer, Router, Server};
+use axum::{Router, Server};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 
 async fn graphql_handler(
@@ -26,7 +26,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(graphql_playground).post(graphql_handler))
-        .layer(AddExtensionLayer::new(schema));
+        .layer(Extension(schema));
 
     println!("Playground: http://localhost:8000");
 
