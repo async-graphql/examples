@@ -6,10 +6,7 @@ use axum::routing::get;
 use axum::{extract::Extension, Router, Server};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
-async fn graphql_handler(
-    schema: Extension<BooksSchema>,
-    req: GraphQLRequest,
-) -> GraphQLResponse {
+async fn graphql_handler(schema: Extension<BooksSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
