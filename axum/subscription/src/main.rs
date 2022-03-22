@@ -3,11 +3,11 @@ use async_graphql::Schema;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use axum::response::{self, IntoResponse};
 use axum::routing::get;
-use axum::{extract, AddExtensionLayer, Router, Server};
+use axum::{extract::Extension, Router, Server};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
 async fn graphql_handler(
-    schema: extract::Extension<BooksSchema>,
+    schema: Extension<BooksSchema>,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
@@ -28,7 +28,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(graphql_playground).post(graphql_handler))
         .route("/ws", GraphQLSubscription::new(schema.clone()))
-        .layer(AddExtensionLayer::new(schema));
+        .layer(Extension(schema));
 
     println!("Playground: http://localhost:8000");
 

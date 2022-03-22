@@ -4,7 +4,7 @@ use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::extract::Extension;
 use axum::response::{Html, IntoResponse};
 use axum::routing::get;
-use axum::{AddExtensionLayer, Router};
+use axum::Router;
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use hyper::{Method, Server};
 use tower_http::cors::{CorsLayer, Origin};
@@ -27,7 +27,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(graphql_playground).post(graphql_handler))
-        .layer(AddExtensionLayer::new(schema))
+        .layer(Extension(schema))
         .layer(
             CorsLayer::new()
                 .allow_origin(Origin::predicate(|_, _| true))
