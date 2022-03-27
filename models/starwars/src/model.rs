@@ -112,13 +112,20 @@ impl QueryRoot {
         #[graphql(
             desc = "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."
         )]
-        episode: Episode,
+        episode: Option<Episode>,
     ) -> Character<'a> {
         let star_wars = ctx.data_unchecked::<StarWars>();
-        if episode == Episode::Empire {
-            Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
-        } else {
-            Droid(star_wars.chars.get(star_wars.artoo).unwrap()).into()
+        match episode {
+            Some(episode_name) => {
+                if episode_name == Episode::Empire {
+                    Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
+                } else {
+                    Droid(star_wars.chars.get(star_wars.artoo).unwrap()).into()
+                }
+            }
+            None => {
+                Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
+            }
         }
     }
 
