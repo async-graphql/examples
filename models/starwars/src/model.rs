@@ -123,9 +123,7 @@ impl QueryRoot {
                     Droid(star_wars.chars.get(star_wars.artoo).unwrap()).into()
                 }
             }
-            None => {
-                Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
-            }
+            None => Human(star_wars.chars.get(star_wars.luke).unwrap()).into(),
         }
     }
 
