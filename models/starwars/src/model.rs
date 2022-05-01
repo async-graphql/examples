@@ -1,8 +1,8 @@
 #![allow(clippy::needless_lifetimes)]
 
 use async_graphql::{
-    connection::{query, Connection, Edge, EmptyFields},
-    Context, Enum, Error, Interface, Object, Result,
+    connection::{query, Connection, DefaultConnectionName, DefaultEdgeName, Edge, EmptyFields},
+    Context, Enum, Error, Interface, Object, OutputType, Result,
 };
 
 use super::StarWars;
@@ -145,11 +145,18 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<usize, Human<'a>, EmptyFields, EmptyFields>> {
+    ) -> Result<
+        Connection<
+            DefaultConnectionName,
+            DefaultEdgeName,
+            usize,
+            Human<'a>,
+            EmptyFields,
+            EmptyFields,
+        >,
+    > {
         let humans = ctx.data_unchecked::<StarWars>().humans().to_vec();
-        query_characters(after, before, first, last, &humans)
-            .await
-            .map(|conn| conn.map_node(Human))
+        query_characters(after, before, first, last, &humans, Human).await
     }
 
     async fn droid<'a>(
@@ -167,11 +174,18 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<usize, Droid<'a>, EmptyFields, EmptyFields>> {
+    ) -> Result<
+        Connection<
+            DefaultConnectionName,
+            DefaultEdgeName,
+            usize,
+            Droid<'a>,
+            EmptyFields,
+            EmptyFields,
+        >,
+    > {
         let droids = ctx.data_unchecked::<StarWars>().droids().to_vec();
-        query_characters(after, before, first, last, &droids)
-            .await
-            .map(|conn| conn.map_node(Droid))
+        query_characters(after, before, first, last, &droids, Droid).await
     }
 }
 
@@ -187,13 +201,18 @@ pub enum Character<'a> {
     Droid(Droid<'a>),
 }
 
-async fn query_characters<'a>(
+async fn query_characters<'a, F, T>(
     after: Option<String>,
     before: Option<String>,
     first: Option<i32>,
     last: Option<i32>,
     characters: &[&'a StarWarsChar],
-) -> Result<Connection<usize, &'a StarWarsChar, EmptyFields, EmptyFields>> {
+    map_to: F,
+) -> Result<Connection<DefaultConnectionName, DefaultEdgeName, usize, T, EmptyFields, EmptyFields>>
+where
+    F: Fn(&'a StarWarsChar) -> T,
+    T: OutputType,
+{
     query(
         after,
         before,
@@ -228,11 +247,11 @@ async fn query_characters<'a>(
             }
 
             let mut connection = Connection::new(start > 0, end < characters.len());
-            connection.append(
+            connection.edges.extend(
                 slice
                     .iter()
                     .enumerate()
-                    .map(|(idx, item)| Edge::new(start + idx, *item)),
+                    .map(|(idx, item)| Edge::new(start + idx, (map_to)(*item))),
             );
             Ok::<_, Error>(connection)
         },
