@@ -1,12 +1,11 @@
 mod simple_broker;
 
+use std::{sync::Arc, time::Duration};
+
 use async_graphql::{Context, Enum, Object, Result, Schema, Subscription, ID};
-use futures_util::lock::Mutex;
-use futures_util::{Stream, StreamExt};
+use futures_util::{lock::Mutex, Stream, StreamExt};
 use simple_broker::SimpleBroker;
 use slab::Slab;
-use std::sync::Arc;
-use std::time::Duration;
 
 pub type BooksSchema = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 

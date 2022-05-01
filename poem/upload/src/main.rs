@@ -1,11 +1,16 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptySubscription, Schema};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptySubscription, Schema,
+};
 use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
-use poem::listener::TcpListener;
-use poem::middleware::Cors;
-use poem::web::{Data, Html};
-use poem::{get, handler, EndpointExt, IntoResponse, Route, Server};
+use poem::{
+    get, handler,
+    listener::TcpListener,
+    middleware::Cors,
+    web::{Data, Html},
+    EndpointExt, IntoResponse, Route, Server,
+};
 
 #[handler]
 async fn index(schema: Data<&FilesSchema>, req: GraphQLRequest) -> GraphQLResponse {

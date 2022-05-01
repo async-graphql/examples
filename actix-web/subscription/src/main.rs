@@ -1,7 +1,8 @@
-use actix_web::web::Data;
-use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use actix_web::{guard, web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Result};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 

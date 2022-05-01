@@ -1,7 +1,8 @@
-use actix_web::web::Data;
-use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 

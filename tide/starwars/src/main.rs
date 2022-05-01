@@ -1,8 +1,11 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use std::env;
+
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_std::task;
 use starwars::{QueryRoot, StarWars};
-use std::env;
 use tide::{http::mime, Body, Response, StatusCode};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
@@ -40,10 +43,12 @@ async fn run() -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::time::Duration;
+
     use async_std::prelude::*;
     use serde_json::json;
-    use std::time::Duration;
+
+    use super::*;
 
     #[test]
     fn sample() -> Result<()> {

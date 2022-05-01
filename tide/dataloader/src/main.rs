@@ -1,14 +1,15 @@
-use async_graphql::dataloader::{DataLoader, Loader};
-use async_graphql::futures_util::TryStreamExt;
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use std::collections::HashMap;
+
 use async_graphql::{
+    dataloader::{DataLoader, Loader},
+    futures_util::TryStreamExt,
+    http::{playground_source, GraphQLPlaygroundConfig},
     Context, EmptyMutation, EmptySubscription, FieldError, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
 use async_trait::async_trait;
 use itertools::Itertools;
 use sqlx::{Pool, Sqlite};
-use std::collections::HashMap;
 use tide::{http::mime, Body, Response, StatusCode};
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
@@ -119,10 +120,12 @@ async fn run() -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::time::Duration;
+
     use async_std::prelude::*;
     use serde_json::{json, Value};
-    use std::time::Duration;
+
+    use super::*;
 
     #[test]
     fn sample() -> Result<()> {

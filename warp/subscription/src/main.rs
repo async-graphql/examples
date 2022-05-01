@@ -1,8 +1,11 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use std::convert::Infallible;
+
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_graphql_warp::{graphql_subscription, GraphQLResponse};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use std::convert::Infallible;
 use warp::{http::Response as HttpResponse, Filter};
 
 #[tokio::main]

@@ -1,9 +1,14 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
-use axum::response::{self, IntoResponse};
-use axum::routing::get;
-use axum::{extract::Extension, Router, Server};
+use axum::{
+    extract::Extension,
+    response::{self, IntoResponse},
+    routing::get,
+    Router, Server,
+};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
 async fn graphql_handler(schema: Extension<BooksSchema>, req: GraphQLRequest) -> GraphQLResponse {

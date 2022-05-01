@@ -1,10 +1,10 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use poem::listener::TcpListener;
-use poem::web::Html;
-use poem::{get, handler, IntoResponse, Route, Server};
+use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {

@@ -1,10 +1,14 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
-use axum::extract::Extension;
-use axum::response::{self, IntoResponse};
-use axum::routing::get;
-use axum::{Router, Server};
+use axum::{
+    extract::Extension,
+    response::{self, IntoResponse},
+    routing::get,
+    Router, Server,
+};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 
 async fn graphql_handler(

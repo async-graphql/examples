@@ -1,9 +1,12 @@
 #![allow(clippy::needless_lifetimes)]
 
+use async_graphql::{
+    connection::{query, Connection, Edge, EmptyFields},
+    Context, Enum, Error, Interface, Object, Result,
+};
+
 use super::StarWars;
 use crate::StarWarsChar;
-use async_graphql::connection::{query, Connection, Edge, EmptyFields};
-use async_graphql::{Context, Enum, Error, Interface, Object, Result};
 
 /// One of the films in the Star Wars Trilogy
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]

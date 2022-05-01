@@ -1,9 +1,12 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use std::convert::Infallible;
+
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_graphql_warp::{GraphQLBadRequest, GraphQLResponse};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
-use std::convert::Infallible;
 use warp::{http::Response as HttpResponse, Filter, Rejection};
 
 #[tokio::main]

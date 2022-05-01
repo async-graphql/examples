@@ -1,9 +1,9 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_graphql_poem::GraphQL;
-use poem::listener::TcpListener;
-use poem::web::Html;
-use poem::{get, handler, IntoResponse, Route, Server};
+use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
 use starwars::{QueryRoot, StarWars};
 
 #[handler]

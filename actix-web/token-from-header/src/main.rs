@@ -1,7 +1,10 @@
-use actix_web::http::header::HeaderMap;
-use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{Data, EmptyMutation, Schema};
+use actix_web::{
+    guard, http::header::HeaderMap, web, App, HttpRequest, HttpResponse, HttpServer, Result,
+};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Data, EmptyMutation, Schema,
+};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
 

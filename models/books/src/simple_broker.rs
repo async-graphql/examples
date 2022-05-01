@@ -1,9 +1,11 @@
-use std::any::{Any, TypeId};
-use std::collections::HashMap;
-use std::marker::PhantomData;
-use std::pin::Pin;
-use std::sync::Mutex;
-use std::task::{Context, Poll};
+use std::{
+    any::{Any, TypeId},
+    collections::HashMap,
+    marker::PhantomData,
+    pin::Pin,
+    sync::Mutex,
+    task::{Context, Poll},
+};
 
 use futures_channel::mpsc::{self, UnboundedReceiver, UnboundedSender};
 use futures_util::{Stream, StreamExt};

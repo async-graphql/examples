@@ -1,10 +1,14 @@
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::{EmptySubscription, Schema};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptySubscription, Schema,
+};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
-use axum::extract::Extension;
-use axum::response::{Html, IntoResponse};
-use axum::routing::get;
-use axum::Router;
+use axum::{
+    extract::Extension,
+    response::{Html, IntoResponse},
+    routing::get,
+    Router,
+};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use hyper::{Method, Server};
 use tower_http::cors::{CorsLayer, Origin};

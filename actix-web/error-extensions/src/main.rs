@@ -1,10 +1,9 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_web::web::Data;
-use actix_web::{guard, web, App, HttpResponse, HttpServer};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
 use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
     EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
     Schema,
 };
@@ -49,8 +48,8 @@ impl QueryRoot {
             .map_err(|e: std::num::ParseIntError| e.extend_with(|_, e| e.set("code", 404)))?)
     }
 
-    // THIS does unfortunately NOT work because ErrorExtensions is implemented for &E and not E.
-    // Which is necessary for the overwrite by the user.
+    // THIS does unfortunately NOT work because ErrorExtensions is implemented for
+    // &E and not E. Which is necessary for the overwrite by the user.
 
     // async fn parse_with_extensions_result(&self) -> FieldResult<i32> {
     //    Ok("234a".parse().extend_err(|_| json!({"code": 404}))?)

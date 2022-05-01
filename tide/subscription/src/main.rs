@@ -1,11 +1,12 @@
 use std::env;
 
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_std::task;
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use tide::http::mime;
-use tide::{Body, Response, StatusCode};
+use tide::{http::mime, Body, Response, StatusCode};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
