@@ -1,7 +1,7 @@
 #![allow(clippy::needless_lifetimes)]
 
 use async_graphql::{
-    connection::{query, Connection, DefaultConnectionName, DefaultEdgeName, Edge, EmptyFields},
+    connection::{query, Connection, Edge},
     Context, Enum, Error, Interface, Object, OutputType, Result,
 };
 
@@ -145,16 +145,7 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<
-        Connection<
-            DefaultConnectionName,
-            DefaultEdgeName,
-            usize,
-            Human<'a>,
-            EmptyFields,
-            EmptyFields,
-        >,
-    > {
+    ) -> Result<Connection<usize, Human<'a>>> {
         let humans = ctx.data_unchecked::<StarWars>().humans().to_vec();
         query_characters(after, before, first, last, &humans, Human).await
     }
@@ -174,16 +165,7 @@ impl QueryRoot {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<
-        Connection<
-            DefaultConnectionName,
-            DefaultEdgeName,
-            usize,
-            Droid<'a>,
-            EmptyFields,
-            EmptyFields,
-        >,
-    > {
+    ) -> Result<Connection<usize, Droid<'a>>> {
         let droids = ctx.data_unchecked::<StarWars>().droids().to_vec();
         query_characters(after, before, first, last, &droids, Droid).await
     }
@@ -208,7 +190,7 @@ async fn query_characters<'a, F, T>(
     last: Option<i32>,
     characters: &[&'a StarWarsChar],
     map_to: F,
-) -> Result<Connection<DefaultConnectionName, DefaultEdgeName, usize, T, EmptyFields, EmptyFields>>
+) -> Result<Connection<usize, T>>
 where
     F: Fn(&'a StarWarsChar) -> T,
     T: OutputType,
