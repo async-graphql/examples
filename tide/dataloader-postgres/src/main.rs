@@ -57,10 +57,9 @@ struct QueryRoot;
 impl QueryRoot {
     async fn book(&self, ctx: &Context<'_>, id: i32) -> Result<Option<Book>> {
         println!("pre load book by id {:?}", id);
-        Ok(ctx
-            .data_unchecked::<DataLoader<BookLoader>>()
+        ctx.data_unchecked::<DataLoader<BookLoader>>()
             .load_one(id)
-            .await?)
+            .await
     }
 }
 

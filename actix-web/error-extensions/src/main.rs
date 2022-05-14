@@ -43,9 +43,9 @@ impl QueryRoot {
 
     // Foreign types can be extended
     async fn parse_with_extensions(&self) -> FieldResult<i32> {
-        Ok("234a"
+        "234a"
             .parse()
-            .map_err(|e: std::num::ParseIntError| e.extend_with(|_, e| e.set("code", 404)))?)
+            .map_err(|e: std::num::ParseIntError| e.extend_with(|_, e| e.set("code", 404)))
     }
 
     // THIS does unfortunately NOT work because ErrorExtensions is implemented for
