@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    Context, Object, Result, Schema, Subscription,
-};
+use async_graphql::{http::GraphiQLSource, Context, Object, Result, Schema, Subscription};
 use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use futures_util::{Stream, StreamExt};
 use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
@@ -44,9 +41,12 @@ impl SubscriptionRoot {
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(
-        GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
-    ))
+    Html(
+        GraphiQLSource::build()
+            .endpoint("http://localhost:8000")
+            .subscription_endpoint("ws://localhost:8000/ws")
+            .finish(),
+    )
 }
 
 #[tokio::main]

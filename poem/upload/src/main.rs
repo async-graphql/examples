@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use poem::{
@@ -19,7 +16,11 @@ async fn index(schema: Data<&FilesSchema>, req: GraphQLRequest) -> GraphQLRespon
 
 #[handler]
 async fn gql_playground() -> impl IntoResponse {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+    Html(
+        GraphiQLSource::build()
+            .endpoint("http://localhost:8000")
+            .finish(),
+    )
 }
 
 #[tokio::main]

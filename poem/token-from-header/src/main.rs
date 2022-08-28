@@ -1,5 +1,5 @@
 use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig, ALL_WEBSOCKET_PROTOCOLS},
+    http::{GraphiQLSource, ALL_WEBSOCKET_PROTOCOLS},
     EmptyMutation, Schema,
 };
 use async_graphql_poem::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
@@ -20,9 +20,12 @@ fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(
-        GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
-    ))
+    Html(
+        GraphiQLSource::build()
+            .endpoint("http://localhost:8000")
+            .subscription_endpoint("ws://localhost:8000/ws")
+            .finish(),
+    )
 }
 
 #[handler]
