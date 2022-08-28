@@ -1,19 +1,19 @@
 use actix_web::{
     guard, http::header::HeaderMap, web, App, HttpRequest, HttpResponse, HttpServer, Result,
 };
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    Data, EmptyMutation, Schema,
-};
+use async_graphql::{http::GraphiQLSource, Data, EmptyMutation, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
 
 async fn gql_playground() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(
-            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
-        ))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .subscription_endpoint("ws://localhost:8000/ws")
+                .finish(),
+        )
 }
 
 fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {

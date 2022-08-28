@@ -1,8 +1,5 @@
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use starwars::{QueryRoot, StarWars, StarWarsSchema};
 
@@ -11,10 +8,13 @@ async fn index(schema: web::Data<StarWarsSchema>, req: GraphQLRequest) -> GraphQ
 }
 
 async fn index_playground() -> Result<HttpResponse> {
-    let source = playground_source(GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"));
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(source))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .finish(),
+        ))
 }
 
 #[actix_web::main]

@@ -1,6 +1,6 @@
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
 use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig, MultipartOptions},
+    http::{GraphiQLSource, MultipartOptions},
     EmptySubscription, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
@@ -13,7 +13,11 @@ async fn index(schema: web::Data<FilesSchema>, req: GraphQLRequest) -> GraphQLRe
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(GraphQLPlaygroundConfig::new("/")))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .finish(),
+        )
 }
 
 #[actix_web::main]

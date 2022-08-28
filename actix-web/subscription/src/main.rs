@@ -1,8 +1,5 @@
 use actix_web::{guard, web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Result};
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    Schema,
-};
+use async_graphql::{http::GraphiQLSource, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
@@ -13,9 +10,12 @@ async fn index(schema: web::Data<BooksSchema>, req: GraphQLRequest) -> GraphQLRe
 async fn index_playground() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(
-            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
-        )))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .subscription_endpoint("ws://localhost:8000/ws")
+                .finish(),
+        ))
 }
 
 async fn index_ws(
