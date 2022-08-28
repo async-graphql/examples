@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
 use rocket::{response::content, routes, State};
 use starwars::{QueryRoot, StarWars};
@@ -10,7 +7,7 @@ pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
 #[rocket::get("/")]
 fn graphql_playground() -> content::RawHtml<String> {
-    content::RawHtml(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+    content::RawHtml(GraphiQLSource::build().endpoint("/graphql").finish())
 }
 
 #[rocket::get("/graphql?<query..>")]
