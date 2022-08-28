@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_graphql::{
     dataloader::{DataLoader, Loader},
     futures_util::TryStreamExt,
-    http::{playground_source, GraphQLPlaygroundConfig},
+    http::GraphiQLSource,
     Context, EmptyMutation, EmptySubscription, FieldError, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
@@ -104,9 +104,11 @@ async fn run() -> Result<()> {
     app.at("/graphql").post(async_graphql_tide::graphql(schema));
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
-        resp.set_body(Body::from_string(playground_source(
-            GraphQLPlaygroundConfig::new("/graphql"),
-        )));
+        resp.set_body(Body::from_string(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000/graphql")
+                .finish(),
+        ));
         resp.set_content_type(mime::HTML);
         Ok(resp)
     });
