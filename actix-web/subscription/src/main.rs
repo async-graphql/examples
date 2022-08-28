@@ -13,7 +13,7 @@ async fn index_playground() -> Result<HttpResponse> {
         .body(
             GraphiQLSource::build()
                 .endpoint("http://localhost:8000")
-                .subscription_endpoint("ws://localhost:8000/ws")
+                .subscription_endpoint("ws://localhost:8000")
                 .finish(),
         ))
 }
