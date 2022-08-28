@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::Extension,
@@ -18,7 +15,11 @@ async fn graphql_handler(schema: Extension<FilesSchema>, req: GraphQLRequest) ->
 }
 
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+    Html(
+        GraphiQLSource::build()
+            .endpoint("http://localhost:8000")
+            .finish(),
+    )
 }
 
 #[tokio::main]
