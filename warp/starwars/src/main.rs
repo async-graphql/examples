@@ -1,9 +1,6 @@
 use std::convert::Infallible;
 
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_warp::{GraphQLBadRequest, GraphQLResponse};
 use http::StatusCode;
 use starwars::{QueryRoot, StarWars};
@@ -29,7 +26,11 @@ async fn main() {
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         HttpResponse::builder()
             .header("content-type", "text/html")
-            .body(playground_source(GraphQLPlaygroundConfig::new("/")))
+            .body(
+                GraphiQLSource::build()
+                    .endpoint("http://localhost:8000")
+                    .finish(),
+            )
     });
 
     let routes = graphql_playground
