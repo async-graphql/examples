@@ -18,7 +18,7 @@ async fn run() -> Result<()> {
         .data(StarWars::new())
         .finish();
 
-    println!("Playground: http://{}", listen_addr);
+    println!("GraphiQL IDE: http://{}", listen_addr);
 
     let mut app = tide::new();
 

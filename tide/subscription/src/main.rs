@@ -14,7 +14,7 @@ async fn run() -> Result<()> {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     let mut app = tide::new();
 

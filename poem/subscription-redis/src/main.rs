@@ -40,7 +40,7 @@ impl SubscriptionRoot {
 }
 
 #[handler]
-async fn graphql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -58,13 +58,10 @@ async fn main() {
         .finish();
 
     let app = Route::new()
-        .at(
-            "/",
-            get(graphql_playground).post(GraphQL::new(schema.clone())),
-        )
+        .at("/", get(graphiql).post(GraphQL::new(schema.clone())))
         .at("/ws", get(GraphQLSubscription::new(schema)));
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("0.0.0.0:8000"))
         .run(app)
         .await

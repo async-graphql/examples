@@ -6,7 +6,7 @@ use starwars::{QueryRoot, StarWars};
 pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
 #[rocket::get("/")]
-fn graphql_playground() -> content::RawHtml<String> {
+fn graphiql() -> content::RawHtml<String> {
     content::RawHtml(GraphiQLSource::build().endpoint("/graphql").finish())
 }
 
@@ -29,8 +29,7 @@ fn rocket() -> _ {
         .data(StarWars::new())
         .finish();
 
-    rocket::build().manage(schema).mount(
-        "/",
-        routes![graphql_query, graphql_request, graphql_playground],
-    )
+    rocket::build()
+        .manage(schema)
+        .mount("/", routes![graphql_query, graphql_request, graphiql])
 }

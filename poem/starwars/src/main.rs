@@ -4,7 +4,7 @@ use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, 
 use starwars::{QueryRoot, StarWars};
 
 #[handler]
-async fn graphql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -18,9 +18,9 @@ async fn main() {
         .data(StarWars::new())
         .finish();
 
-    let app = Route::new().at("/", get(graphql_playground).post(GraphQL::new(schema)));
+    let app = Route::new().at("/", get(graphiql).post(GraphQL::new(schema)));
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("0.0.0.0:8000"))
         .run(app)
         .await

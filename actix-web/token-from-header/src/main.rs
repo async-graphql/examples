@@ -5,7 +5,7 @@ use async_graphql::{http::GraphiQLSource, Data, EmptyMutation, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
 
-async fn gql_playground() -> HttpResponse {
+async fn graphiql() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
@@ -54,12 +54,12 @@ async fn index_ws(
 async fn main() -> std::io::Result<()> {
     let schema = Schema::new(QueryRoot, EmptyMutation, SubscriptionRoot);
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(schema.clone()))
-            .service(web::resource("/").guard(guard::Get()).to(gql_playground))
+            .service(web::resource("/").guard(guard::Get()).to(graphiql))
             .service(web::resource("/").guard(guard::Post()).to(index))
             .service(web::resource("/ws").to(index_ws))
     })

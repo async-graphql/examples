@@ -19,7 +19,7 @@ fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
 }
 
 #[handler]
-async fn graphql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -69,11 +69,11 @@ async fn main() {
     let schema = Schema::new(QueryRoot, EmptyMutation, SubscriptionRoot);
 
     let app = Route::new()
-        .at("/", get(graphql_playground).post(index))
+        .at("/", get(graphiql).post(index))
         .at("/ws", get(ws))
         .data(schema);
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
     Server::new(TcpListener::bind("0.0.0.0:8000"))
         .run(app)
         .await

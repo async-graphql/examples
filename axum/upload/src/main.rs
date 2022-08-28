@@ -14,7 +14,7 @@ async fn graphql_handler(schema: Extension<FilesSchema>, req: GraphQLRequest) ->
     schema.execute(req.0).await.into()
 }
 
-async fn graphql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -28,10 +28,10 @@ async fn main() {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     let app = Router::new()
-        .route("/", get(graphql_playground).post(graphql_handler))
+        .route("/", get(graphiql).post(graphql_handler))
         .layer(Extension(schema))
         .layer(
             CorsLayer::new()

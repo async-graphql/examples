@@ -114,7 +114,7 @@ async fn run() -> Result<()> {
         Ok(resp)
     });
 
-    println!("Playground: http://127.0.0.1:8000");
+    println!("GraphiQL IDE: http://127.0.0.1:8000");
     app.listen("127.0.0.1:8000").await?;
 
     Ok(())

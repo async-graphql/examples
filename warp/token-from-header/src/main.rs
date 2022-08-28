@@ -9,9 +9,9 @@ use warp::{http::Response as HttpResponse, ws::Ws, Filter};
 async fn main() {
     let schema = Schema::build(QueryRoot, EmptyMutation, SubscriptionRoot).finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
-    let graphql_playground = warp::path::end().and(warp::get()).map(|| {
+    let graphiql = warp::path::end().and(warp::get()).map(|| {
         HttpResponse::builder()
             .header("content-type", "text/html")
             .body(
@@ -68,6 +68,6 @@ async fn main() {
             },
         );
 
-    let routes = subscription.or(graphql_playground).or(graphql_post);
+    let routes = subscription.or(graphiql).or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }

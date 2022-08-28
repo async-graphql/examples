@@ -15,7 +15,7 @@ async fn graphql_handler(
     schema.execute(req.into_inner()).await.into()
 }
 
-async fn graphql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     response::Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -30,10 +30,10 @@ async fn main() {
         .finish();
 
     let app = Router::new()
-        .route("/", get(graphql_playground).post(graphql_handler))
+        .route("/", get(graphiql).post(graphql_handler))
         .layer(Extension(schema));
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     Server::bind(&"0.0.0.0:8000".parse().unwrap())
         .serve(app.into_make_service())

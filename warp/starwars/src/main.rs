@@ -12,7 +12,7 @@ async fn main() {
         .data(StarWars::new())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     let graphql_post = async_graphql_warp::graphql(schema).and_then(
         |(schema, request): (
@@ -23,7 +23,7 @@ async fn main() {
         },
     );
 
-    let graphql_playground = warp::path::end().and(warp::get()).map(|| {
+    let graphiql = warp::path::end().and(warp::get()).map(|| {
         HttpResponse::builder()
             .header("content-type", "text/html")
             .body(
@@ -33,7 +33,7 @@ async fn main() {
             )
     });
 
-    let routes = graphql_playground
+    let routes = graphiql
         .or(graphql_post)
         .recover(|err: Rejection| async move {
             if let Some(GraphQLBadRequest(err)) = err.find() {

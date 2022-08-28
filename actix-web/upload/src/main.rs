@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
         App::new()

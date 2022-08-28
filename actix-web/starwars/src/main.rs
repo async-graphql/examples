@@ -7,7 +7,7 @@ async fn index(schema: web::Data<StarWarsSchema>, req: GraphQLRequest) -> GraphQ
     schema.execute(req.into_inner()).await.into()
 }
 
-async fn index_playground() -> Result<HttpResponse> {
+async fn index_graphiql() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
@@ -23,13 +23,13 @@ async fn main() -> std::io::Result<()> {
         .data(StarWars::new())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
             .service(web::resource("/").guard(guard::Post()).to(index))
-            .service(web::resource("/").guard(guard::Get()).to(index_playground))
+            .service(web::resource("/").guard(guard::Get()).to(index_graphiql))
     })
     .bind("127.0.0.1:8000")?
     .run()

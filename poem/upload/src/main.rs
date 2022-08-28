@@ -15,7 +15,7 @@ async fn index(schema: Data<&FilesSchema>, req: GraphQLRequest) -> GraphQLRespon
 }
 
 #[handler]
-async fn gql_playground() -> impl IntoResponse {
+async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
             .endpoint("http://localhost:8000")
@@ -29,10 +29,10 @@ async fn main() -> std::io::Result<()> {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     let app = Route::new()
-        .at("/", get(gql_playground).post(index))
+        .at("/", get(graphiql).post(index))
         .with(Cors::new())
         .data(schema);
     Server::new(TcpListener::bind("0.0.0.0:8000"))
