@@ -1,9 +1,6 @@
 use std::env;
 
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_std::task;
 use starwars::{QueryRoot, StarWars};
 use tide::{http::mime, Body, Response, StatusCode};
@@ -21,7 +18,7 @@ async fn run() -> Result<()> {
         .data(StarWars::new())
         .finish();
 
-    println!("Playground: http://{}", listen_addr);
+    println!("GraphiQL IDE: http://{}", listen_addr);
 
     let mut app = tide::new();
 
@@ -29,9 +26,9 @@ async fn run() -> Result<()> {
 
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
-        resp.set_body(Body::from_string(playground_source(
-            GraphQLPlaygroundConfig::new("/graphql"),
-        )));
+        resp.set_body(Body::from_string(
+            GraphiQLSource::build().endpoint("/graphql").finish(),
+        ));
         resp.set_content_type(mime::HTML);
         Ok(resp)
     });

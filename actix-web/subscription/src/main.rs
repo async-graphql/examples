@@ -1,8 +1,5 @@
 use actix_web::{guard, web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Result};
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    Schema,
-};
+use async_graphql::{http::GraphiQLSource, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
@@ -10,12 +7,15 @@ async fn index(schema: web::Data<BooksSchema>, req: GraphQLRequest) -> GraphQLRe
     schema.execute(req.into_inner()).await.into()
 }
 
-async fn index_playground() -> Result<HttpResponse> {
+async fn index_graphiql() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(
-            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
-        )))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .subscription_endpoint("ws://localhost:8000")
+                .finish(),
+        ))
 }
 
 async fn index_ws(
@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
         App::new()
@@ -44,7 +44,7 @@ async fn main() -> std::io::Result<()> {
                     .guard(guard::Header("upgrade", "websocket"))
                     .to(index_ws),
             )
-            .service(web::resource("/").guard(guard::Get()).to(index_playground))
+            .service(web::resource("/").guard(guard::Get()).to(index_graphiql))
     })
     .bind("127.0.0.1:8000")?
     .run()

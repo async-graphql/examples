@@ -3,9 +3,8 @@ extern crate thiserror;
 
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
 use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
-    Schema,
+    http::GraphiQLSource, EmptyMutation, EmptySubscription, ErrorExtensions, FieldError,
+    FieldResult, Object, ResultExt, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
@@ -102,12 +101,16 @@ async fn index(
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(GraphQLPlaygroundConfig::new("/")))
+        .body(
+            GraphiQLSource::build()
+                .endpoint("http://localhost:8000")
+                .finish(),
+        )
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
         App::new()

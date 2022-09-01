@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::Extension,
@@ -18,8 +15,12 @@ async fn graphql_handler(
     schema.execute(req.into_inner()).await.into()
 }
 
-async fn graphql_playground() -> impl IntoResponse {
-    response::Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+async fn graphiql() -> impl IntoResponse {
+    response::Html(
+        GraphiQLSource::build()
+            .endpoint("http://localhost:8000")
+            .finish(),
+    )
 }
 
 #[tokio::main]
@@ -29,10 +30,10 @@ async fn main() {
         .finish();
 
     let app = Router::new()
-        .route("/", get(graphql_playground).post(graphql_handler))
+        .route("/", get(graphiql).post(graphql_handler))
         .layer(Extension(schema));
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     Server::bind(&"0.0.0.0:8000".parse().unwrap())
         .serve(app.into_make_service())

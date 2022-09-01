@@ -1,7 +1,4 @@
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Schema,
-};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
 use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use rocket::{response::content, routes, State};
@@ -9,8 +6,8 @@ use rocket::{response::content, routes, State};
 pub type StarWarsSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
 #[rocket::get("/")]
-fn graphql_playground() -> content::RawHtml<String> {
-    content::RawHtml(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+fn graphiql() -> content::RawHtml<String> {
+    content::RawHtml(GraphiQLSource::build().endpoint("/graphql").finish())
 }
 
 #[rocket::get("/graphql?<query..>")]
@@ -48,7 +45,7 @@ fn rocket() -> _ {
             graphql_query,
             graphql_request,
             graphql_request_multipart,
-            graphql_playground
+            graphiql
         ],
     )
 }

@@ -1,9 +1,6 @@
 use std::convert::Infallible;
 
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    Schema,
-};
+use async_graphql::{http::GraphiQLSource, Schema};
 use async_graphql_warp::{graphql_subscription, GraphQLResponse};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use warp::{http::Response as HttpResponse, Filter};
@@ -14,7 +11,7 @@ async fn main() {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
+    println!("GraphiQL IDE: http://localhost:8000");
 
     let graphql_post = async_graphql_warp::graphql(schema.clone()).and_then(
         |(schema, request): (
@@ -25,16 +22,17 @@ async fn main() {
         },
     );
 
-    let graphql_playground = warp::path::end().and(warp::get()).map(|| {
+    let graphiql = warp::path::end().and(warp::get()).map(|| {
         HttpResponse::builder()
             .header("content-type", "text/html")
-            .body(playground_source(
-                GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
-            ))
+            .body(
+                GraphiQLSource::build()
+                    .endpoint("http://localhost:8000")
+                    .subscription_endpoint("ws://localhost:8000")
+                    .finish(),
+            )
     });
 
-    let routes = graphql_subscription(schema)
-        .or(graphql_playground)
-        .or(graphql_post);
+    let routes = graphql_subscription(schema).or(graphiql).or(graphql_post);
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }
