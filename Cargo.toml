@@ -5,6 +5,7 @@ members = [
     "models/files",
     "models/token",
 
+    "poem/opentelemetry-basic",
     "poem/starwars",
     "poem/subscription",
     "poem/subscription-redis",
