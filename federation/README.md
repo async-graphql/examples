@@ -4,7 +4,7 @@ An example of using [Apollo Federation](https://www.apollographql.com/docs/feder
 
 ## The schema
 
-You can view the full schema in [Apollo Studio]() without needing to run the example (you will need to run the example in order to query it).
+You can view the full schema in [Apollo Studio](https://studio.apollographql.com/public/async-graphql-Examples/home?variant=current) without needing to run the example (you will need to run the example in order to query it).
 
 ## How to run
 
