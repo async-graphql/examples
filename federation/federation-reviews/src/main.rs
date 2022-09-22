@@ -1,54 +1,129 @@
 use std::convert::Infallible;
 
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
+use async_graphql::{
+    ComplexObject, Context, EmptyMutation, EmptySubscription, Enum, Object, Schema, SimpleObject,
+    ID,
+};
 use async_graphql_warp::graphql;
 use warp::{Filter, Reply};
 
+#[derive(SimpleObject)]
+#[graphql(complex)]
 struct User {
     id: ID,
+    #[graphql(override_from = "accounts")]
+    review_count: u32,
+    #[graphql(external)]
+    joined_timestamp: u64,
 }
 
-#[Object(extends)]
-impl User {
-    #[graphql(external)]
-    async fn id(&self) -> &ID {
-        &self.id
-    }
+#[derive(Enum, Eq, PartialEq, Copy, Clone)]
+enum Trustworthiness {
+    ReallyTrusted,
+    KindaTrusted,
+    NotTrusted,
+}
 
+#[ComplexObject]
+impl User {
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
         let reviews = ctx.data_unchecked::<Vec<Review>>();
         reviews
             .iter()
-            .filter(|review| review.author.id == self.id)
+            .filter(|review| review.get_author().id == self.id)
             .collect()
     }
+
+    #[graphql(requires = "joinedTimestamp")]
+    async fn trustworthiness(&self) -> Trustworthiness {
+        if self.joined_timestamp < 1_000 && self.review_count > 1 {
+            Trustworthiness::ReallyTrusted
+        } else if self.joined_timestamp < 2_000 {
+            Trustworthiness::KindaTrusted
+        } else {
+            Trustworthiness::NotTrusted
+        }
+    }
 }
 
+#[derive(SimpleObject)]
+#[graphql(complex)]
 struct Product {
     upc: String,
+    #[graphql(external)]
+    price: u32,
 }
 
-#[Object(extends)]
+#[ComplexObject]
 impl Product {
-    #[graphql(external)]
-    async fn upc(&self) -> &String {
-        &self.upc
-    }
-
     async fn reviews<'a>(&self, ctx: &'a Context<'_>) -> Vec<&'a Review> {
         let reviews = ctx.data_unchecked::<Vec<Review>>();
         reviews
             .iter()
-            .filter(|review| review.product.upc == self.upc)
+            .filter(|review| review.get_product().upc == self.upc)
             .collect()
     }
 }
 
 #[derive(SimpleObject)]
+#[graphql(complex)]
 struct Review {
+    id: ID,
     body: String,
-    author: User,
-    product: Product,
+    pictures: Vec<Picture>,
+}
+
+#[ComplexObject]
+impl Review {
+    #[graphql(provides = "price")]
+    async fn product<'a>(&self) -> Product {
+        self.get_product()
+    }
+
+    async fn author(&self) -> User {
+        self.get_author()
+    }
+}
+
+impl Review {
+    fn get_product(&self) -> Product {
+        match self.id.as_str() {
+            "review-1" => Product {
+                upc: "top-1".to_string(),
+                price: 10,
+            },
+            "review-2" => Product {
+                upc: "top-2".to_string(),
+                price: 20,
+            },
+            "review-3" => Product {
+                upc: "top-3".to_string(),
+                price: 30,
+            },
+            _ => panic!("Unknown review id"),
+        }
+    }
+
+    fn get_author(&self) -> User {
+        let user_id: ID = match self.id.as_str() {
+            "review-1" => "1234",
+            "review-2" => "1234",
+            "review-3" => "7777",
+            _ => panic!("Unknown review id"),
+        }
+        .into();
+        user_by_id(user_id, None)
+    }
+}
+
+#[derive(SimpleObject)]
+#[graphql(shareable)]
+struct Picture {
+    url: String,
+    width: u32,
+    height: u32,
+    #[graphql(inaccessible)] // Field not added to Accounts yet
+    alt_text: String,
 }
 
 struct Query;
@@ -56,13 +131,28 @@ struct Query;
 #[Object]
 impl Query {
     #[graphql(entity)]
-    async fn find_user_by_id(&self, id: ID) -> User {
-        User { id }
+    async fn find_user_by_id(&self, #[graphql(key)] id: ID, joined_timestamp: Option<u64>) -> User {
+        user_by_id(id, joined_timestamp)
     }
 
     #[graphql(entity)]
     async fn find_product_by_upc(&self, upc: String) -> Product {
-        Product { upc }
+        Product { upc, price: 0 }
+    }
+}
+
+fn user_by_id(id: ID, joined_timestamp: Option<u64>) -> User {
+    let review_count = match id.as_str() {
+        "1234" => 2,
+        "7777" => 1,
+        _ => 0,
+    };
+    // This will be set if the user requested the fields that require it.
+    let joined_timestamp = joined_timestamp.unwrap_or(9001);
+    User {
+        id,
+        review_count,
+        joined_timestamp,
     }
 }
 
@@ -70,25 +160,32 @@ impl Query {
 async fn main() {
     let reviews = vec![
         Review {
+            id: "review-1".into(),
             body: "A highly effective form of birth control.".into(),
-            author: User { id: "1234".into() },
-            product: Product {
-                upc: "top-1".to_string(),
-            },
+            pictures: vec![
+                Picture {
+                    url: "http://localhost:8080/ugly_hat.jpg".to_string(),
+                    width: 100,
+                    height: 100,
+                    alt_text: "A Trilby".to_string(),
+                },
+                Picture {
+                    url: "http://localhost:8080/troll_face.jpg".to_string(),
+                    width: 42,
+                    height: 42,
+                    alt_text: "The troll face meme".to_string(),
+                },
+            ],
         },
         Review {
+            id: "review-2".into(),
             body: "Fedoras are one of the most fashionable hats around and can look great with a variety of outfits.".into(),
-            author: User { id: "1234".into() },
-            product: Product {
-                upc: "top-1".to_string(),
-            },
+            pictures: vec![],
         },
         Review {
+            id: "review-3".into(),
             body: "This is the last straw. Hat you will wear. 11/10".into(),
-            author: User { id: "7777".into() },
-            product: Product {
-                upc: "top-1".to_string(),
-            },
+            pictures: vec![],
         },
     ];
 

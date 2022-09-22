@@ -8,4 +8,4 @@
 - [tide] Examples for `tide`
 - [rocket] Examples for `rocket`
 - [axum] Examples for `axum`
-- [federation] Examples for `Federation`
+- [federation] Examples for [Apollo Federation](https://www.apollographql.com/docs/federation/)
