@@ -27,6 +27,8 @@ impl SubscriptionRoot {
     }
 }
 
+// For more details see:
+// https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#connectioninit
 pub async fn on_connection_init(value: serde_json::Value) -> Result<Data> {
     #[derive(Deserialize)]
     struct Payload {
