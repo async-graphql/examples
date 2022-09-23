@@ -33,6 +33,8 @@ pub async fn on_connection_init(value: serde_json::Value) -> Result<Data> {
         token: String,
     }
 
+    // Coerce the connection params into our `Payload` struct so we can
+    // validate the token exists in the headers.
     if let Ok(payload) = serde_json::from_value::<Payload>(value) {
         let mut data = Data::default();
         data.insert(Token(payload.token));

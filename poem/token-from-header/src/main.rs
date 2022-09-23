@@ -53,6 +53,7 @@ async fn ws(
         .protocols(ALL_WEBSOCKET_PROTOCOLS)
         .on_upgrade(move |stream| {
             GraphQLWebSocket::new(stream, schema, protocol)
+                // connection params are used to extract the token in this fn
                 .on_connection_init(on_connection_init)
                 .serve()
         })
