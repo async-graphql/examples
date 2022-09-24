@@ -27,12 +27,16 @@ impl SubscriptionRoot {
     }
 }
 
+// For more details see:
+// https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#connectioninit
 pub async fn on_connection_init(value: serde_json::Value) -> Result<Data> {
     #[derive(Deserialize)]
     struct Payload {
         token: String,
     }
 
+    // Coerce the connection params into our `Payload` struct so we can
+    // validate the token exists in the headers.
     if let Ok(payload) = serde_json::from_value::<Payload>(value) {
         let mut data = Data::default();
         data.insert(Token(payload.token));

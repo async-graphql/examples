@@ -48,17 +48,12 @@ async fn ws(
     protocol: GraphQLProtocol,
     websocket: WebSocket,
 ) -> impl IntoResponse {
-    let mut data = async_graphql::Data::default();
-    if let Some(token) = get_token_from_headers(headers) {
-        data.insert(token);
-    }
-
     let schema = schema.0.clone();
     websocket
         .protocols(ALL_WEBSOCKET_PROTOCOLS)
         .on_upgrade(move |stream| {
             GraphQLWebSocket::new(stream, schema, protocol)
-                .with_data(data)
+                // connection params are used to extract the token in this fn
                 .on_connection_init(on_connection_init)
                 .serve()
         })
