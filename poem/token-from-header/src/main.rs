@@ -44,7 +44,6 @@ async fn index(
 #[handler]
 async fn ws(
     schema: Data<&TokenSchema>,
-    headers: &HeaderMap,
     protocol: GraphQLProtocol,
     websocket: WebSocket,
 ) -> impl IntoResponse {

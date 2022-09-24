@@ -1,7 +1,7 @@
 use actix_web::{
     guard, http::header::HeaderMap, web, App, HttpRequest, HttpResponse, HttpServer, Result,
 };
-use async_graphql::{http::GraphiQLSource, Data, EmptyMutation, Schema};
+use async_graphql::{http::GraphiQLSource, EmptyMutation, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
 
@@ -39,13 +39,7 @@ async fn index_ws(
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
-    let mut data = Data::default();
-    if let Some(token) = get_token_from_headers(req.headers()) {
-        data.insert(token);
-    }
-
     GraphQLSubscription::new(Schema::clone(&*schema))
-        .with_data(data)
         .on_connection_init(on_connection_init)
         .start(&req, payload)
 }

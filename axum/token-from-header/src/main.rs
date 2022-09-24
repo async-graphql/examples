@@ -1,6 +1,6 @@
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig, ALL_WEBSOCKET_PROTOCOLS},
-    Data, EmptyMutation, Schema,
+    EmptyMutation, Schema,
 };
 use async_graphql_axum::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
 use axum::{
@@ -40,18 +40,11 @@ async fn graphql_ws_handler(
     Extension(schema): Extension<TokenSchema>,
     protocol: GraphQLProtocol,
     websocket: WebSocketUpgrade,
-    headers: HeaderMap,
 ) -> Response {
-    let mut data = Data::default();
-    if let Some(token) = get_token_from_headers(&headers) {
-        data.insert(token);
-    }
-
     websocket
         .protocols(ALL_WEBSOCKET_PROTOCOLS)
         .on_upgrade(move |stream| {
             GraphQLWebSocket::new(stream, schema.clone(), protocol)
-                .with_data(data)
                 .on_connection_init(on_connection_init)
                 .serve()
         })
