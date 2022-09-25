@@ -8,12 +8,13 @@ use warp::{Filter, Reply};
 struct Product {
     upc: String,
     name: String,
+    #[graphql(shareable)]
     price: i32,
 }
 
 struct Query;
 
-#[Object(extends)]
+#[Object]
 impl Query {
     async fn top_products<'a>(&self, ctx: &'a Context<'_>) -> &'a Vec<Product> {
         ctx.data_unchecked::<Vec<Product>>()
