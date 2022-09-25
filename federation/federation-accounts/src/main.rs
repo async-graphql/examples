@@ -1,8 +1,6 @@
-use std::convert::Infallible;
-
 use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
-use async_graphql_warp::graphql;
-use warp::{Filter, Reply};
+use async_graphql_poem::GraphQL;
+use poem::{listener::TcpListener, Route, Server};
 
 #[derive(SimpleObject)]
 struct User {
@@ -65,17 +63,9 @@ impl Query {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> std::io::Result<()> {
     let schema = Schema::new(Query, EmptyMutation, EmptySubscription);
-
-    warp::serve(graphql(schema).and_then(
-        |(schema, request): (
-            Schema<Query, EmptyMutation, EmptySubscription>,
-            async_graphql::Request,
-        )| async move {
-            Ok::<_, Infallible>(warp::reply::json(&schema.execute(request).await).into_response())
-        },
-    ))
-    .run(([0, 0, 0, 0], 4001))
-    .await;
+    Server::new(TcpListener::bind("0.0.0.0:4001"))
+        .run(Route::new().at("/", GraphQL::new(schema)))
+        .await
 }

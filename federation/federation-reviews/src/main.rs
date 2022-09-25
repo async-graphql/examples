@@ -1,11 +1,9 @@
-use std::convert::Infallible;
-
 use async_graphql::{
     ComplexObject, Context, EmptyMutation, EmptySubscription, Enum, Object, Schema, SimpleObject,
     ID,
 };
-use async_graphql_warp::graphql;
-use warp::{Filter, Reply};
+use async_graphql_poem::GraphQL;
+use poem::{listener::TcpListener, Route, Server};
 
 #[derive(SimpleObject)]
 #[graphql(complex)]
@@ -157,7 +155,7 @@ fn user_by_id(id: ID, joined_timestamp: Option<u64>) -> User {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> std::io::Result<()> {
     let reviews = vec![
         Review {
             id: "review-1".into(),
@@ -193,14 +191,7 @@ async fn main() {
         .data(reviews)
         .finish();
 
-    warp::serve(graphql(schema).and_then(
-        |(schema, request): (
-            Schema<Query, EmptyMutation, EmptySubscription>,
-            async_graphql::Request,
-        )| async move {
-            Ok::<_, Infallible>(warp::reply::json(&schema.execute(request).await).into_response())
-        },
-    ))
-    .run(([0, 0, 0, 0], 4003))
-    .await;
+    Server::new(TcpListener::bind("0.0.0.0:4003"))
+        .run(Route::new().at("/", GraphQL::new(schema)))
+        .await
 }

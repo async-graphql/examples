@@ -1,8 +1,6 @@
-use std::convert::Infallible;
-
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema, SimpleObject};
-use async_graphql_warp::graphql;
-use warp::{Filter, Reply};
+use async_graphql_poem::GraphQL;
+use poem::{listener::TcpListener, Route, Server};
 
 #[derive(SimpleObject)]
 struct Product {
@@ -32,7 +30,7 @@ impl Query {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> std::io::Result<()> {
     let hats = vec![
         Product {
             upc: "top-1".to_string(),
@@ -55,14 +53,7 @@ async fn main() {
         .data(hats)
         .finish();
 
-    warp::serve(graphql(schema).and_then(
-        |(schema, request): (
-            Schema<Query, EmptyMutation, EmptySubscription>,
-            async_graphql::Request,
-        )| async move {
-            Ok::<_, Infallible>(warp::reply::json(&schema.execute(request).await).into_response())
-        },
-    ))
-    .run(([0, 0, 0, 0], 4002))
-    .await;
+    Server::new(TcpListener::bind("0.0.0.0:4002"))
+        .run(Route::new().at("/", GraphQL::new(schema)))
+        .await
 }
