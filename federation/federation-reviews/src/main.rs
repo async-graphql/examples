@@ -191,7 +191,7 @@ async fn main() -> std::io::Result<()> {
         .data(reviews)
         .finish();
 
-    Server::new(TcpListener::bind("0.0.0.0:4003"))
+    Server::new(TcpListener::bind("127.0.0.1:4003"))
         .run(Route::new().at("/", GraphQL::new(schema)))
         .await
 }

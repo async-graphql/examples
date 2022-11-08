@@ -12,12 +12,12 @@ fn graphiql() -> content::RawHtml<String> {
 
 #[rocket::get("/graphql?<query..>")]
 async fn graphql_query(schema: &State<FilesSchema>, query: GraphQLQuery) -> GraphQLResponse {
-    query.execute(schema).await
+    query.execute(schema.inner()).await
 }
 
 #[rocket::post("/graphql", data = "<request>", format = "application/json", rank = 1)]
 async fn graphql_request(schema: &State<FilesSchema>, request: GraphQLRequest) -> GraphQLResponse {
-    request.execute(schema).await
+    request.execute(schema.inner()).await
 }
 
 #[rocket::post(
@@ -30,7 +30,7 @@ async fn graphql_request_multipart(
     schema: &State<FilesSchema>,
     request: GraphQLRequest,
 ) -> GraphQLResponse {
-    request.execute(schema).await
+    request.execute(schema.inner()).await
 }
 
 #[rocket::launch]

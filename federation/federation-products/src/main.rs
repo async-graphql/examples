@@ -53,7 +53,7 @@ async fn main() -> std::io::Result<()> {
         .data(hats)
         .finish();
 
-    Server::new(TcpListener::bind("0.0.0.0:4002"))
+    Server::new(TcpListener::bind("127.0.0.1:4002"))
         .run(Route::new().at("/", GraphQL::new(schema)))
         .await
 }

@@ -11,6 +11,7 @@ members = [
     "poem/subscription-redis",
     "poem/token-from-header",
     "poem/upload",
+    "poem/dynamic-schema",
 
     "actix-web/token-from-header",
     "actix-web/subscription",

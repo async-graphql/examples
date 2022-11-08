@@ -39,7 +39,7 @@ async fn main() {
                 .allow_methods(vec![Method::GET, Method::POST]),
         );
 
-    Server::bind(&"0.0.0.0:8000".parse().unwrap())
+    Server::bind(&"127.0.0.1:8000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

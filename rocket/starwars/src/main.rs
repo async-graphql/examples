@@ -12,7 +12,7 @@ fn graphiql() -> content::RawHtml<String> {
 
 #[rocket::get("/graphql?<query..>")]
 async fn graphql_query(schema: &State<StarWarsSchema>, query: GraphQLQuery) -> GraphQLResponse {
-    query.execute(schema).await
+    query.execute(schema.inner()).await
 }
 
 #[rocket::post("/graphql", data = "<request>", format = "application/json")]
@@ -20,7 +20,7 @@ async fn graphql_request(
     schema: &State<StarWarsSchema>,
     request: GraphQLRequest,
 ) -> GraphQLResponse {
-    request.execute(schema).await
+    request.execute(schema.inner()).await
 }
 
 #[rocket::launch]

@@ -35,7 +35,7 @@ async fn main() -> std::io::Result<()> {
         .at("/", get(graphiql).post(index))
         .with(Cors::new())
         .data(schema);
-    Server::new(TcpListener::bind("0.0.0.0:8000"))
+    Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)
         .await
 }

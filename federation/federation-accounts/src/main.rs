@@ -65,7 +65,7 @@ impl Query {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let schema = Schema::new(Query, EmptyMutation, EmptySubscription);
-    Server::new(TcpListener::bind("0.0.0.0:4001"))
+    Server::new(TcpListener::bind("127.0.0.1:4001"))
         .run(Route::new().at("/", GraphQL::new(schema)))
         .await
 }

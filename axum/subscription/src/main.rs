@@ -34,7 +34,7 @@ async fn main() {
 
     println!("GraphiQL IDE: http://localhost:8000");
 
-    Server::bind(&"0.0.0.0:8000".parse().unwrap())
+    Server::bind(&"127.0.0.1:8000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

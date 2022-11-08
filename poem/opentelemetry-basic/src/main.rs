@@ -28,14 +28,14 @@ async fn main() {
         .data(schema);
 
     let example_curl = "\
-    curl '0.0.0.0:8000' \
+    curl '127.0.0.1:8000' \
     -X POST \
     -H 'content-type: application/json' \
     --data '{ \"query\": \"{ hello }\" }'";
 
     println!("Run this curl command from another terminal window to see opentelemetry output in this terminal.\n\n{example_curl}\n\n");
 
-    Server::new(TcpListener::bind("0.0.0.0:8000"))
+    Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)
         .await
         .unwrap();
