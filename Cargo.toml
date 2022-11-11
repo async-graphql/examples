@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "models/starwars",
+    "models/dynamic-starwars",
     "models/books",
     "models/files",
     "models/token",
@@ -12,6 +13,7 @@ members = [
     "poem/token-from-header",
     "poem/upload",
     "poem/dynamic-schema",
+    "poem/dynamic-starwars",
 
     "actix-web/token-from-header",
     "actix-web/subscription",

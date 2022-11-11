@@ -1,0 +1,8 @@
+[package]
+name = "dynamic-starwars"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../..", features = ["dynamic-schema"] }
+slab = "0.4.2"

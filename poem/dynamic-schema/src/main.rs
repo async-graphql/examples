@@ -15,9 +15,10 @@ async fn graphql_playground() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let query = Object::new("Query").field(Field::new("value", TypeRef::INT, |_| {
-        FieldFuture::new(async { Ok(Some(Value::from(100))) })
-    }));
+    let query =
+        Object::new("Query").field(Field::new("value", TypeRef::named_nn(TypeRef::INT), |_| {
+            FieldFuture::new(async { Ok(Some(Value::from(100))) })
+        }));
     let schema = Schema::build(query.type_name(), None, None)
         .register(query)
         .finish()?;

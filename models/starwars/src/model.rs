@@ -119,8 +119,8 @@ impl QueryRoot {
     ) -> Character<'a> {
         let star_wars = ctx.data_unchecked::<StarWars>();
         match episode {
-            Some(episode_name) => {
-                if episode_name == Episode::Empire {
+            Some(episode) => {
+                if episode == Episode::Empire {
                     Human(star_wars.chars.get(star_wars.luke).unwrap()).into()
                 } else {
                     Droid(star_wars.chars.get(star_wars.artoo).unwrap()).into()
@@ -233,7 +233,7 @@ where
                 slice
                     .iter()
                     .enumerate()
-                    .map(|(idx, item)| Edge::new(start + idx, (map_to)(*item))),
+                    .map(|(idx, item)| Edge::new(start + idx, (map_to)(item))),
             );
             Ok::<_, Error>(connection)
         },
