@@ -25,9 +25,9 @@ fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
 }
 
 async fn graphql_handler(
-    req: GraphQLRequest,
     Extension(schema): Extension<TokenSchema>,
     headers: HeaderMap,
+    req: GraphQLRequest,
 ) -> GraphQLResponse {
     let mut req = req.into_inner();
     if let Some(token) = get_token_from_headers(&headers) {

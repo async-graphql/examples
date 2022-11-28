@@ -29,7 +29,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(graphiql).post(graphql_handler))
-        .route("/ws", GraphQLSubscription::new(schema.clone()))
+        .route_service("/ws", GraphQLSubscription::new(schema.clone()))
         .layer(Extension(schema));
 
     println!("GraphiQL IDE: http://localhost:8000");
