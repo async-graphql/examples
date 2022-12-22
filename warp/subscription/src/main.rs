@@ -27,8 +27,8 @@ async fn main() {
             .header("content-type", "text/html")
             .body(
                 GraphiQLSource::build()
-                    .endpoint("http://localhost:8000")
-                    .subscription_endpoint("ws://localhost:8000")
+                    .endpoint("/")
+                    .subscription_endpoint("/")
                     .finish(),
             )
     });

@@ -7,8 +7,8 @@ use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, 
 async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
-            .endpoint("http://localhost:8000")
-            .subscription_endpoint("ws://localhost:8000/ws")
+            .endpoint("/")
+            .subscription_endpoint("/ws")
             .finish(),
     )
 }

@@ -26,8 +26,8 @@ async fn run() -> Result<()> {
         let mut resp = Response::new(StatusCode::Ok);
         resp.set_body(Body::from_string(
             GraphiQLSource::build()
-                .endpoint("http://localhost:8000/graphql")
-                .subscription_endpoint("ws://localhost:8000/graphql")
+                .endpoint("/graphql")
+                .subscription_endpoint("/graphql")
                 .finish(),
         ));
         resp.set_content_type(mime::HTML);

@@ -26,11 +26,7 @@ async fn main() {
     let graphiql = warp::path::end().and(warp::get()).map(|| {
         HttpResponse::builder()
             .header("content-type", "text/html")
-            .body(
-                GraphiQLSource::build()
-                    .endpoint("http://localhost:8000")
-                    .finish(),
-            )
+            .body(GraphiQLSource::build().endpoint("/").finish())
     });
 
     let routes = graphiql

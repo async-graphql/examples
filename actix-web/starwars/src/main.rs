@@ -10,11 +10,7 @@ async fn index(schema: web::Data<StarWarsSchema>, req: GraphQLRequest) -> GraphQ
 async fn index_graphiql() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(
-            GraphiQLSource::build()
-                .endpoint("http://localhost:8000")
-                .finish(),
-        ))
+        .body(GraphiQLSource::build().endpoint("/").finish()))
 }
 
 #[actix_web::main]

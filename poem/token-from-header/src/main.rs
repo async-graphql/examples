@@ -22,8 +22,8 @@ fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
 async fn graphiql() -> impl IntoResponse {
     Html(
         GraphiQLSource::build()
-            .endpoint("http://localhost:8000")
-            .subscription_endpoint("ws://localhost:8000/ws")
+            .endpoint("/")
+            .subscription_endpoint("/ws")
             .finish(),
     )
 }
