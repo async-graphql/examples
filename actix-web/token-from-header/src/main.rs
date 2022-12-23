@@ -10,8 +10,8 @@ async fn graphiql() -> HttpResponse {
         .content_type("text/html; charset=utf-8")
         .body(
             GraphiQLSource::build()
-                .endpoint("http://localhost:8000")
-                .subscription_endpoint("ws://localhost:8000/ws")
+                .endpoint("/")
+                .subscription_endpoint("/ws")
                 .finish(),
         )
 }

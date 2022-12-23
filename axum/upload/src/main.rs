@@ -15,11 +15,7 @@ async fn graphql_handler(schema: Extension<FilesSchema>, req: GraphQLRequest) ->
 }
 
 async fn graphiql() -> impl IntoResponse {
-    Html(
-        GraphiQLSource::build()
-            .endpoint("http://localhost:8000")
-            .finish(),
-    )
+    Html(GraphiQLSource::build().endpoint("/").finish())
 }
 
 #[tokio::main]

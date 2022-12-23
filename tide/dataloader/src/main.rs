@@ -105,9 +105,7 @@ async fn run() -> Result<()> {
     app.at("/").get(|_| async move {
         let mut resp = Response::new(StatusCode::Ok);
         resp.set_body(Body::from_string(
-            GraphiQLSource::build()
-                .endpoint("http://localhost:8000/graphql")
-                .finish(),
+            GraphiQLSource::build().endpoint("/graphql").finish(),
         ));
         resp.set_content_type(mime::HTML);
         Ok(resp)

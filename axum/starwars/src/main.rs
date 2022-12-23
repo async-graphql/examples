@@ -16,11 +16,7 @@ async fn graphql_handler(
 }
 
 async fn graphiql() -> impl IntoResponse {
-    response::Html(
-        GraphiQLSource::build()
-            .endpoint("http://localhost:8000")
-            .finish(),
-    )
+    response::Html(GraphiQLSource::build().endpoint("/").finish())
 }
 
 #[tokio::main]

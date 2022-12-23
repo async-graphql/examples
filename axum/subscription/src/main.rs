@@ -15,8 +15,8 @@ async fn graphql_handler(schema: Extension<BooksSchema>, req: GraphQLRequest) ->
 async fn graphiql() -> impl IntoResponse {
     response::Html(
         GraphiQLSource::build()
-            .endpoint("http://localhost:8000")
-            .subscription_endpoint("ws://localhost:8000/ws")
+            .endpoint("/")
+            .subscription_endpoint("/ws")
             .finish(),
     )
 }

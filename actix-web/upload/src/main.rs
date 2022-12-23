@@ -13,11 +13,7 @@ async fn index(schema: web::Data<FilesSchema>, req: GraphQLRequest) -> GraphQLRe
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(
-            GraphiQLSource::build()
-                .endpoint("http://localhost:8000")
-                .finish(),
-        )
+        .body(GraphiQLSource::build().endpoint("/").finish())
 }
 
 #[actix_web::main]
