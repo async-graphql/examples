@@ -10,7 +10,7 @@ async-graphql-tide = { path = "../../../integrations/tide" }
 async-std = "1.9.0"
 async-trait = "0.1.42"
 itertools = "0.10.0"
-sqlx = { version = "0.5.5", features = ["runtime-async-std-rustls", "postgres"] }
+sqlx = { version = "0.6.2", features = ["runtime-async-std-rustls", "postgres"] }
 tide = "0.16.0"
 
 [dev-dependencies]
