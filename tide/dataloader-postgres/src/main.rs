@@ -8,8 +8,7 @@ use async_graphql::{
 };
 use async_std::task;
 use async_trait::async_trait;
-use itertools::Itertools;
-use sqlx::{Pool, Postgres};
+use sqlx::PgPool;
 use tide::{http::mime, Body, Response, StatusCode};
 
 #[derive(sqlx::FromRow, Clone, SimpleObject)]
@@ -19,10 +18,10 @@ pub struct Book {
     author: String,
 }
 
-pub struct BookLoader(Pool<Postgres>);
+pub struct BookLoader(PgPool);
 
 impl BookLoader {
-    fn new(postgres_pool: Pool<Postgres>) -> Self {
+    fn new(postgres_pool: PgPool) -> Self {
         Self(postgres_pool)
     }
 }
@@ -39,11 +38,8 @@ impl Loader<i32> for BookLoader {
             return Err("MOCK DBError".into());
         }
 
-        let query = format!(
-            "SELECT id, name, author FROM books WHERE id IN ({})",
-            keys.iter().join(",")
-        );
-        Ok(sqlx::query_as(&query)
+        Ok(sqlx::query_as("SELECT id, name, author FROM books WHERE id = ANY($1)")
+            .bind(keys)
             .fetch(&self.0)
             .map_ok(|book: Book| (book.id, book))
             .try_collect()
@@ -68,7 +64,7 @@ fn main() -> Result<()> {
 }
 
 async fn run() -> Result<()> {
-    let postgres_pool: Pool<Postgres> = Pool::connect(&env::var("DATABASE_URL")?).await?;
+    let postgres_pool = PgPool::connect(&env::var("DATABASE_URL")?).await?;
 
     sqlx::query(
         r#"
