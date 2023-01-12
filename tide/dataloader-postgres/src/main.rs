@@ -38,12 +38,14 @@ impl Loader<i32> for BookLoader {
             return Err("MOCK DBError".into());
         }
 
-        Ok(sqlx::query_as("SELECT id, name, author FROM books WHERE id = ANY($1)")
-            .bind(keys)
-            .fetch(&self.0)
-            .map_ok(|book: Book| (book.id, book))
-            .try_collect()
-            .await?)
+        Ok(
+            sqlx::query_as("SELECT id, name, author FROM books WHERE id = ANY($1)")
+                .bind(keys)
+                .fetch(&self.0)
+                .map_ok(|book: Book| (book.id, book))
+                .try_collect()
+                .await?,
+        )
     }
 }
 
