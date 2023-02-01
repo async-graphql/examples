@@ -51,6 +51,7 @@ async fn main() -> std::io::Result<()> {
 
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(hats)
+        .directive(directives::lowercase)
         .finish();
 
     Server::new(TcpListener::bind("127.0.0.1:4002"))

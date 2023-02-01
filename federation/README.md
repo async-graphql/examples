@@ -13,3 +13,4 @@ You can view the full schema in [Apollo Studio](https://studio.apollographql.com
    1. Start each subgraph with `cargo run --bin {subgraph_name}`
    2. Add each subgraph to `rover dev` with `rover dev --url http://localhost:{port} --name {subgraph_name}`
 3. Visit `http://localhost:3000` in a browser.
+4. You can now run queries like the one in `query.graphql` against the router.
