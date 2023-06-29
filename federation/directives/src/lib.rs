@@ -18,7 +18,7 @@ impl CustomDirective for LowercaseDirective {
     }
 }
 
-#[Directive(location = "field")]
+#[Directive(location = "Field")]
 pub fn lowercase() -> impl CustomDirective {
     LowercaseDirective
 }
