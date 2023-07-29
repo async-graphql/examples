@@ -16,6 +16,7 @@ struct User {
 }
 
 #[derive(Enum, Eq, PartialEq, Copy, Clone)]
+#[allow(clippy::enum_variant_names)]
 enum Trustworthiness {
     ReallyTrusted,
     KindaTrusted,
