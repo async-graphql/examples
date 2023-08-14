@@ -62,6 +62,31 @@ pub fn schema() -> Result<Schema, SchemaError> {
             },
         ));
 
+    let mutatation = Object::new("Mutation").field(
+        Field::new("createBook", TypeRef::named(book.type_name()), |ctx| {
+            FieldFuture::new(async move {
+                let mut book_by_id = ctx.data_unchecked::<BookStore>().books_by_id.lock().await;
+                let mut store = ctx.data_unchecked::<BookStore>().store.lock().await;
+                let id = ctx.args.try_get("id")?;
+                let name = ctx.args.try_get("name")?;
+                let author = ctx.args.try_get("author")?;
+                let book = Book {
+                    id: id.string()?.into(),
+                    name: name.string()?.to_string(),
+                    author: author.string()?.to_string(),
+                };
+                let key = store.insert(book);
+                book_by_id.insert(id.string()?.to_string(), key);
+                Ok(Some(FieldValue::owned_any(store.get(key).unwrap().clone())))
+            })
+        })
+        .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING)))
+        .argument(InputValue::new("name", TypeRef::named_nn(TypeRef::STRING)))
+        .argument(InputValue::new(
+            "author",
+            TypeRef::named_nn(TypeRef::STRING),
+        )),
+    );
     // Todo:Show book.value
     let subscription = Subscription::new("Subscription").field(SubscriptionField::new(
         "value",
@@ -74,10 +99,15 @@ pub fn schema() -> Result<Schema, SchemaError> {
         },
     ));
 
-    Schema::build(query.type_name(), None, Some(subscription.type_name()))
-        .register(book)
-        .register(query)
-        .register(subscription)
-        .data(BookStore::new())
-        .finish()
+    Schema::build(
+        query.type_name(),
+        Some(mutatation.type_name()),
+        Some(subscription.type_name()),
+    )
+    .register(book)
+    .register(query)
+    .register(subscription)
+    .register(mutatation)
+    .data(BookStore::new())
+    .finish()
 }

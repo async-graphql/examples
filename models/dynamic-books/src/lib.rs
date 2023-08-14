@@ -47,8 +47,4 @@ impl BookStore {
             value: 10,
         }
     }
-
-    // pub fn get_book_id(&self, id: &str) -> Option<usize> {
-    //     self.books_by_id.get(id).copied()
-    // }
 }
