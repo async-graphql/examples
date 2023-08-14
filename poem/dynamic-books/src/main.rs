@@ -19,8 +19,8 @@ async fn main() {
         .at("/", get(graphiql).post(GraphQL::new(schema.clone())))
         .at("/ws", get(GraphQLSubscription::new(schema)));
 
-    println!("GraphiQL IDE: http://localhost:8000");
-    Server::new(TcpListener::bind("127.0.0.1:8000"))
+    println!("GraphiQL IDE: http://localhost:8080");
+    Server::new(TcpListener::bind("127.0.0.1:8080"))
         .run(app)
         .await
         .unwrap();

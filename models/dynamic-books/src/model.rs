@@ -62,38 +62,51 @@ pub fn schema() -> Result<Schema, SchemaError> {
             },
         ));
 
-    let mutatation = Object::new("Mutation").field(
-        Field::new("createBook", TypeRef::named(book.type_name()), |ctx| {
-            FieldFuture::new(async move {
-                let mut book_by_id = ctx.data_unchecked::<BookStore>().books_by_id.lock().await;
-                let mut store = ctx.data_unchecked::<BookStore>().store.lock().await;
-                let id = ctx.args.try_get("id")?;
-                let name = ctx.args.try_get("name")?;
-                let author = ctx.args.try_get("author")?;
-                let book = Book {
-                    id: id.string()?.into(),
-                    name: name.string()?.to_string(),
-                    author: author.string()?.to_string(),
-                };
-                let key = store.insert(book);
-                book_by_id.insert(id.string()?.to_string(), key);
-                Ok(Some(FieldValue::owned_any(store.get(key).unwrap().clone())))
+    let mutatation = Object::new("Mutation")
+        .field(
+            Field::new("createBook", TypeRef::named(book.type_name()), |ctx| {
+                FieldFuture::new(async move {
+                    let mut book_by_id = ctx.data_unchecked::<BookStore>().books_by_id.lock().await;
+                    let mut store = ctx.data_unchecked::<BookStore>().store.lock().await;
+                    let id = ctx.args.try_get("id")?;
+                    let name = ctx.args.try_get("name")?;
+                    let author = ctx.args.try_get("author")?;
+                    let book = Book {
+                        id: id.string()?.into(),
+                        name: name.string()?.to_string(),
+                        author: author.string()?.to_string(),
+                    };
+                    let key = store.insert(book);
+                    book_by_id.insert(id.string()?.to_string(), key);
+                    Ok(Some(FieldValue::owned_any(store.get(key).unwrap().clone())))
+                })
             })
-        })
-        .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING)))
-        .argument(InputValue::new("name", TypeRef::named_nn(TypeRef::STRING)))
-        .argument(InputValue::new(
-            "author",
-            TypeRef::named_nn(TypeRef::STRING),
-        )),
-    );
+            .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING)))
+            .argument(InputValue::new("name", TypeRef::named_nn(TypeRef::STRING)))
+            .argument(InputValue::new(
+                "author",
+                TypeRef::named_nn(TypeRef::STRING),
+            )),
+        )
+        .field(
+            Field::new("updateValue", TypeRef::named_nn(TypeRef::INT), |ctx| {
+                FieldFuture::new(async move {
+                    let mut store_value = ctx.data_unchecked::<BookStore>().value.lock().await;
+                    let new_value = ctx.args.try_get("value")?;
+                    let value = new_value.u64()?;
+                    *store_value = value;
+                    Ok(Some(Value::from(*store_value)))
+                })
+            })
+            .argument(InputValue::new("value", TypeRef::named_nn(TypeRef::INT))),
+        );
     // Todo:Show book.value
     let subscription = Subscription::new("Subscription").field(SubscriptionField::new(
         "value",
         TypeRef::named_nn(TypeRef::INT),
         |ctx| {
             SubscriptionFieldFuture::new(async move {
-                let value_1 = ctx.data_unchecked::<BookStore>().value;
+                let value_1: u64 = *ctx.data_unchecked::<BookStore>().value.lock().await;
                 Ok(futures_util::stream::repeat(value_1).map(|value| Ok(Value::from(value))))
             })
         },

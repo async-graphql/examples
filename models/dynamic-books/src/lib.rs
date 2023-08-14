@@ -16,11 +16,10 @@ pub struct Book {
     author: String,
 }
 
-#[derive(Clone)]
 pub struct BookStore {
     store: Storage,
     books_by_id: Mapping,
-    value: usize,
+    value: Arc<Mutex<u64>>,
 }
 impl BookStore {
     #[allow(clippy::new_without_default)]
@@ -44,7 +43,7 @@ impl BookStore {
         Self {
             store: Arc::new(Mutex::new(store)),
             books_by_id: Arc::new(Mutex::new(books_by_id)),
-            value: 10,
+            value: Arc::new(Mutex::new(10)),
         }
     }
 }
