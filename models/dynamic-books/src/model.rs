@@ -19,7 +19,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
             Field::new("name", TypeRef::named_nn(TypeRef::STRING), |ctx| {
                 FieldFuture::new(async move {
                     let book = ctx.parent_value.try_downcast_ref::<Book>()?;
-                    Ok(Some(Value::from(book.name)))
+                    Ok(Some(Value::from(book.name.to_owned())))
                 })
             })
             .description("The name of the book."),
@@ -28,7 +28,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
             Field::new("author", TypeRef::named_nn(TypeRef::STRING), |ctx| {
                 FieldFuture::new(async move {
                     let book = ctx.parent_value.try_downcast_ref::<Book>()?;
-                    Ok(Some(Value::from(book.author)))
+                    Ok(Some(Value::from(book.author.to_owned())))
                 })
             })
             .description("The author of the book."),
@@ -38,11 +38,12 @@ pub fn schema() -> Result<Schema, SchemaError> {
         .field(
             Field::new("getBook", TypeRef::named(book.type_name()), |ctx| {
                 FieldFuture::new(async move {
-                    let store = ctx.data::<BookStore>().unwrap();
                     let id = ctx.args.try_get("id")?;
-                    Ok(store
-                        .get_book(id.string()?)
-                        .map(|b| FieldValue::borrowed_any(b)))
+                    let book_by_id = &ctx.data_unchecked::<BookStore>().books_by_id.lock().await;
+                    let book_id = book_by_id.get(id.string()?).unwrap();
+                    let store = ctx.data_unchecked::<BookStore>().store.lock().await;
+                    let book = store.get(*book_id).cloned();
+                    Ok(book.map(FieldValue::owned_any))
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING))),
@@ -52,10 +53,10 @@ pub fn schema() -> Result<Schema, SchemaError> {
             TypeRef::named_nn_list_nn(book.type_name()),
             |ctx| {
                 FieldFuture::new(async move {
-                    let store = ctx.data::<BookStore>().unwrap();
-                    let books = store.get_books();
+                    let store = ctx.data_unchecked::<BookStore>().store.lock().await;
+                    let books: Vec<Book> = store.iter().map(|(_, book)| book.clone()).collect();
                     Ok(Some(FieldValue::list(
-                        books.into_iter().map(|b| FieldValue::borrowed_any(b)),
+                        books.into_iter().map(FieldValue::owned_any),
                     )))
                 })
             },
