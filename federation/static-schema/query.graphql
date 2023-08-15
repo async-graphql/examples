@@ -1,0 +1,19 @@
+query ExampleQuery {
+    me {
+        id
+        username @lowercase
+        reviews {
+            body
+            ... @defer {
+                product {
+                    reviews {
+                        author {
+                            username
+                        }
+                        body
+                    }
+                }
+            }
+        }
+    }
+}

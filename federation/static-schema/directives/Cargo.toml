@@ -5,5 +5,5 @@ authors = ["sunli <scott_s829@163.com>"]
 edition = "2021"
 
 [dependencies]
-async-graphql = { path = "../../.." }
+async-graphql = { path = "../../../.." }
 async-trait = "0.1.61"

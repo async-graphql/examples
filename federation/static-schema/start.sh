@@ -11,17 +11,17 @@ function cleanup {
 }
 trap cleanup EXIT
 
-cargo build --bin federation-accounts
-cargo build --bin federation-products
-cargo build --bin federation-reviews
+cargo build --bin dynamic-federation-accounts
+cargo build --bin dynamic-federation-products
+cargo build --bin dynamic-federation-reviews
 
-cargo run --bin federation-accounts &
+cargo run --bin dynamic-federation-accounts &
 ACCOUNTS_PID=$!
 
-cargo run --bin federation-products &
+cargo run --bin dynamic-federation-products &
 PRODUCTS_PID=$!
 
-cargo run --bin federation-reviews &
+cargo run --bin dynamic-federation-reviews &
 REVIEWS_PID=$!
 
 sleep 3

@@ -1,12 +1,12 @@
 [package]
-name = "federation-reviews"
+name = "static-federation-products"
 version = "0.2.0"
 authors = ["sunli <scott_s829@163.com>"]
 edition = "2021"
 
 [dependencies]
-async-graphql = { path = "../../.." }
-async-graphql-poem = { path = "../../../integrations/poem" }
+async-graphql = { path = "../../../.." }
+async-graphql-poem = { path = "../../../../integrations/poem" }
 directives = { path = "../directives" }
 tokio = { version = "1.0.2", features = ["macros", "rt-multi-thread"] }
 poem = { version = "1.3.43" }
