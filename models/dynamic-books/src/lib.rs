@@ -1,4 +1,5 @@
 mod model;
+mod simple_broker;
 use async_graphql::ID;
 
 use futures_util::lock::Mutex;

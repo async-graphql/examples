@@ -1,7 +1,10 @@
 use async_graphql::{dynamic::*, Value};
 use futures_util::StreamExt;
 
-use crate::{Book, BookStore};
+use crate::{
+    simple_broker::{self, SimpleBroker},
+    Book, BookStore,
+};
 
 pub fn schema() -> Result<Schema, SchemaError> {
     let book = Object::new("Book")
@@ -76,8 +79,9 @@ pub fn schema() -> Result<Schema, SchemaError> {
                         name: name.string()?.to_string(),
                         author: author.string()?.to_string(),
                     };
-                    let key = store.insert(book);
+                    let key = store.insert(book.clone());
                     book_by_id.insert(id.string()?.to_string(), key);
+                    SimpleBroker::publish(book);
                     Ok(Some(FieldValue::owned_any(store.get(key).unwrap().clone())))
                 })
             })
@@ -102,12 +106,11 @@ pub fn schema() -> Result<Schema, SchemaError> {
         );
     // Todo:Show book.value
     let subscription = Subscription::new("Subscription").field(SubscriptionField::new(
-        "value",
-        TypeRef::named_nn(TypeRef::INT),
-        |ctx| {
-            SubscriptionFieldFuture::new(async move {
-                let value_1: u64 = *ctx.data_unchecked::<BookStore>().value.lock().await;
-                Ok(futures_util::stream::repeat(value_1).map(|value| Ok(Value::from(value))))
+        "bookAdded",
+        TypeRef::named_nn(book.type_name()),
+        |_| {
+            SubscriptionFieldFuture::new(async {
+                Ok(SimpleBroker::<Book>::subscribe().map(|book| Ok(FieldValue::owned_any(book))))
             })
         },
     ));
