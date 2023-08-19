@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
+use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::{
     http::GraphiQLSource, EmptyMutation, EmptySubscription, ErrorExtensions, FieldError,
     FieldResult, Object, ResultExt, Schema,
 };
-use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use async_graphql_actix_web::GraphQL;
 
 #[derive(Debug, Error)]
 pub enum MyError {
@@ -91,13 +91,6 @@ impl QueryRoot {
     }
 }
 
-async fn index(
-    schema: web::Data<Schema<QueryRoot, EmptyMutation, EmptySubscription>>,
-    req: GraphQLRequest,
-) -> GraphQLResponse {
-    schema.execute(req.into_inner()).await.into()
-}
-
 async fn gql_playgound() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -109,13 +102,14 @@ async fn main() -> std::io::Result<()> {
     println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
+        let schema = Schema::new(QueryRoot, EmptyMutation, EmptySubscription);
+
         App::new()
-            .app_data(Data::new(Schema::new(
-                QueryRoot,
-                EmptyMutation,
-                EmptySubscription,
-            )))
-            .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(
+                web::resource("/")
+                    .guard(guard::Post())
+                    .to(GraphQL::new(schema)),
+            )
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
     .bind("127.0.0.1:8000")?

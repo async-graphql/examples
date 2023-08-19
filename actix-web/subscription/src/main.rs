@@ -1,11 +1,7 @@
-use actix_web::{guard, web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Result};
+use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use async_graphql::{http::GraphiQLSource, Schema};
-use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
+use async_graphql_actix_web::{GraphQL, GraphQLSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-
-async fn index(schema: web::Data<BooksSchema>, req: GraphQLRequest) -> GraphQLResponse {
-    schema.execute(req.into_inner()).await.into()
-}
 
 async fn index_graphiql() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
@@ -28,16 +24,19 @@ async fn index_ws(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let schema = Schema::build(QueryRoot, MutationRoot, SubscriptionRoot)
-        .data(Storage::default())
-        .finish();
-
     println!("GraphiQL IDE: http://localhost:8000");
 
     HttpServer::new(move || {
+        let schema = Schema::build(QueryRoot, MutationRoot, SubscriptionRoot)
+            .data(Storage::default())
+            .finish();
+
         App::new()
-            .app_data(Data::new(schema.clone()))
-            .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(
+                web::resource("/")
+                    .guard(guard::Post())
+                    .to(GraphQL::new(schema)),
+            )
             .service(
                 web::resource("/")
                     .guard(guard::Get())
