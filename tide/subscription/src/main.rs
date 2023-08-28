@@ -34,7 +34,7 @@ async fn run() -> Result<()> {
         Ok(resp)
     });
 
-    app.listen("127.0.0.1:8000").await?;
+    app.listen("0.0.0.0:8000").await?;
 
     Ok(())
 }

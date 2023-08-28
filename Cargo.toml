@@ -2,7 +2,6 @@
 members = [
 	"models/starwars",
 	"models/dynamic-starwars",
-	"models/dynamic-books",
 	"models/books",
 	"models/files",
 	"models/token",
@@ -28,10 +27,6 @@ members = [
 	"warp/subscription",
 	"warp/token-from-header",
 
-	"federation/federation-accounts",
-	"federation/federation-products",
-	"federation/federation-reviews",
-
 	"rocket/starwars",
 	"rocket/upload",
 
@@ -44,4 +39,12 @@ members = [
 	"tide/dataloader",
 	"tide/dataloader-postgres",
 	"tide/subscription",
+
+	"federation/static-schema/federation-accounts",
+	"federation/static-schema/federation-products",
+	"federation/static-schema/federation-reviews",
+
+	"federation/dynamic-schema/federation-accounts",
+	"federation/dynamic-schema/federation-products",
+	"federation/dynamic-schema/federation-reviews",
 ]

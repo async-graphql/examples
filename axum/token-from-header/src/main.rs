@@ -4,7 +4,7 @@ use async_graphql::{
 };
 use async_graphql_axum::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
 use axum::{
-    extract::{ws::WebSocketUpgrade, Extension},
+    extract::{ws::WebSocketUpgrade, State},
     http::header::HeaderMap,
     response::{Html, IntoResponse, Response},
     routing::get,
@@ -25,7 +25,7 @@ fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
 }
 
 async fn graphql_handler(
-    Extension(schema): Extension<TokenSchema>,
+    State(schema): State<TokenSchema>,
     headers: HeaderMap,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
@@ -37,7 +37,7 @@ async fn graphql_handler(
 }
 
 async fn graphql_ws_handler(
-    Extension(schema): Extension<TokenSchema>,
+    State(schema): State<TokenSchema>,
     protocol: GraphQLProtocol,
     websocket: WebSocketUpgrade,
 ) -> Response {
@@ -57,7 +57,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(graphql_playground).post(graphql_handler))
         .route("/ws", get(graphql_ws_handler))
-        .layer(Extension(schema));
+        .with_state(schema);
 
     println!("Playground: http://localhost:8000");
 

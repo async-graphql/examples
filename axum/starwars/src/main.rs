@@ -1,19 +1,11 @@
 use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
-use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
+use async_graphql_axum::GraphQL;
 use axum::{
-    extract::Extension,
     response::{self, IntoResponse},
     routing::get,
     Router, Server,
 };
-use starwars::{QueryRoot, StarWars, StarWarsSchema};
-
-async fn graphql_handler(
-    schema: Extension<StarWarsSchema>,
-    req: GraphQLRequest,
-) -> GraphQLResponse {
-    schema.execute(req.into_inner()).await.into()
-}
+use starwars::{QueryRoot, StarWars};
 
 async fn graphiql() -> impl IntoResponse {
     response::Html(GraphiQLSource::build().endpoint("/").finish())
@@ -25,9 +17,7 @@ async fn main() {
         .data(StarWars::new())
         .finish();
 
-    let app = Router::new()
-        .route("/", get(graphiql).post(graphql_handler))
-        .layer(Extension(schema));
+    let app = Router::new().route("/", get(graphiql).post_service(GraphQL::new(schema)));
 
     println!("GraphiQL IDE: http://localhost:8000");
 

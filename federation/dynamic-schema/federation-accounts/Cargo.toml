@@ -1,0 +1,10 @@
+[package]
+name = "dynamic-federation-accounts"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../../..", features = ["dynamic-schema"] }
+async-graphql-poem = { path = "../../../../integrations/poem" }
+tokio = { version = "1.0.2", features = ["macros", "rt-multi-thread"] }
+poem = { version = "1.3.43" }
