@@ -7,14 +7,14 @@ pub use model::schema;
 use slab::Slab;
 use std::sync::Arc;
 
-type Storage = Arc<Mutex<Slab<Book>>>;
-
 #[derive(Clone)]
 pub struct Book {
     id: ID,
     name: String,
     author: String,
 }
+
+type Storage = Arc<Mutex<Slab<Book>>>;
 
 #[derive(Eq, PartialEq, Copy, Clone)]
 pub enum MutationType {

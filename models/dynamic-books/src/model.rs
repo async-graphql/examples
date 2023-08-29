@@ -19,56 +19,49 @@ pub fn schema() -> Result<Schema, SchemaError> {
 
     let book = Object::new("Book")
         .description("A book that will be stored.")
-        .field(
-            Field::new("id", TypeRef::named_nn(TypeRef::ID), |ctx| {
-                FieldFuture::new(async move {
-                    let book = ctx.parent_value.try_downcast_ref::<Book>()?;
-                    Ok(Some(Value::from(book.id.to_owned())))
-                })
+        .field(Field::new("id", TypeRef::named_nn(TypeRef::ID), |ctx| {
+            FieldFuture::new(async move {
+                let book = ctx.parent_value.try_downcast_ref::<Book>()?;
+                Ok(Some(Value::from(book.id.to_owned())))
             })
-            .description("The id of the book."),
-        )
-        .field(
-            Field::new("name", TypeRef::named_nn(TypeRef::STRING), |ctx| {
+        }))
+        .field(Field::new(
+            "name",
+            TypeRef::named_nn(TypeRef::STRING),
+            |ctx| {
                 FieldFuture::new(async move {
                     let book = ctx.parent_value.try_downcast_ref::<Book>()?;
                     Ok(Some(Value::from(book.name.to_owned())))
                 })
-            })
-            .description("The name of the book."),
-        )
-        .field(
-            Field::new("author", TypeRef::named_nn(TypeRef::STRING), |ctx| {
+            },
+        ))
+        .field(Field::new(
+            "author",
+            TypeRef::named_nn(TypeRef::STRING),
+            |ctx| {
                 FieldFuture::new(async move {
                     let book = ctx.parent_value.try_downcast_ref::<Book>()?;
                     Ok(Some(Value::from(book.author.to_owned())))
                 })
-            })
-            .description("The author of the book."),
-        );
+            },
+        ));
     let book_changed = Object::new("BookChanged")
-        .field(
-            Field::new(
-                "mutation_type",
-                TypeRef::named_nn(mutation_type.type_name()),
-                |ctx| {
-                    FieldFuture::new(async move {
-                        let book_changed = ctx.parent_value.try_downcast_ref::<BookChanged>()?;
-                        Ok(Some(FieldValue::from(book_changed.mutation_type)))
-                    })
-                },
-            )
-            .description("The type of mutation."),
-        )
-        .field(
-            Field::new("id", TypeRef::named_nn(TypeRef::ID), |ctx| {
+        .field(Field::new(
+            "mutationType",
+            TypeRef::named_nn(mutation_type.type_name()),
+            |ctx| {
                 FieldFuture::new(async move {
                     let book_changed = ctx.parent_value.try_downcast_ref::<BookChanged>()?;
-                    Ok(Some(Value::from(book_changed.id.to_owned())))
+                    Ok(Some(FieldValue::from(book_changed.mutation_type)))
                 })
+            },
+        ))
+        .field(Field::new("id", TypeRef::named_nn(TypeRef::ID), |ctx| {
+            FieldFuture::new(async move {
+                let book_changed = ctx.parent_value.try_downcast_ref::<BookChanged>()?;
+                Ok(Some(Value::from(book_changed.id.to_owned())))
             })
-            .description("The id of the book."),
-        )
+        }))
         .field(Field::new(
             "book",
             TypeRef::named(book.type_name()),
@@ -85,6 +78,19 @@ pub fn schema() -> Result<Schema, SchemaError> {
         ));
 
     let query_root = Object::new("Query")
+        .field(Field::new(
+            "getBooks",
+            TypeRef::named_list(book.type_name()),
+            |ctx| {
+                FieldFuture::new(async move {
+                    let store = ctx.data_unchecked::<Storage>().lock().await;
+                    let books: Vec<Book> = store.iter().map(|(_, book)| book.clone()).collect();
+                    Ok(Some(FieldValue::list(
+                        books.into_iter().map(FieldValue::owned_any),
+                    )))
+                })
+            },
+        ))
         .field(
             Field::new("getBook", TypeRef::named(book.type_name()), |ctx| {
                 FieldFuture::new(async move {
@@ -100,59 +106,105 @@ pub fn schema() -> Result<Schema, SchemaError> {
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::ID))),
-        )
-        .field(Field::new(
-            "getBooks",
-            TypeRef::named_nn_list_nn(book.type_name()),
-            |ctx| {
+        );
+
+    let mutatation_root = Object::new("Mutation")
+        .field(
+            Field::new("createBook", TypeRef::named(TypeRef::ID), |ctx| {
                 FieldFuture::new(async move {
-                    let store = ctx.data_unchecked::<Storage>().lock().await;
-                    let books: Vec<Book> = store.iter().map(|(_, book)| book.clone()).collect();
-                    Ok(Some(FieldValue::list(
-                        books.into_iter().map(FieldValue::owned_any),
-                    )))
+                    let mut store = ctx.data_unchecked::<Storage>().lock().await;
+                    let name = ctx.args.try_get("name")?;
+                    let author = ctx.args.try_get("author")?;
+                    let entry = store.vacant_entry();
+                    let id: ID = entry.key().into();
+                    let book = Book {
+                        id: id.clone(),
+                        name: name.string()?.to_string(),
+                        author: author.string()?.to_string(),
+                    };
+                    entry.insert(book);
+                    let book_mutated = BookChanged {
+                        mutation_type: MutationType::Created,
+                        id: id.clone(),
+                    };
+                    SimpleBroker::publish(book_mutated);
+                    Ok(Some(Value::from(id)))
+                })
+            })
+            .argument(InputValue::new("name", TypeRef::named_nn(TypeRef::STRING)))
+            .argument(InputValue::new(
+                "author",
+                TypeRef::named_nn(TypeRef::STRING),
+            )),
+        )
+        .field(
+            Field::new("deleteBook", TypeRef::named_nn(TypeRef::BOOLEAN), |ctx| {
+                FieldFuture::new(async move {
+                    let mut store = ctx.data_unchecked::<Storage>().lock().await;
+                    let id = ctx.args.try_get("id")?;
+                    let book_id = match id.string() {
+                        Ok(id) => id.to_string(),
+                        Err(_) => id.u64()?.to_string(),
+                    };
+                    let book_id = book_id.parse::<usize>()?;
+                    if store.contains(book_id) {
+                        store.remove(book_id);
+                        let book_mutated = BookChanged {
+                            mutation_type: MutationType::Deleted,
+                            id: book_id.into(),
+                        };
+                        SimpleBroker::publish(book_mutated);
+                        Ok(Some(Value::from(true)))
+                    } else {
+                        Ok(Some(Value::from(false)))
+                    }
+                })
+            })
+            .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::ID))),
+        );
+    let subscription_root = Subscription::new("Subscription")
+        // .field(
+        //     SubscriptionField::new(
+        //         "bookMutation",
+        //         TypeRef::named_nn(book_changed.type_name()),
+        //         |ctx| {
+        //             SubscriptionFieldFuture::new(async {
+        //                 let mutation_type = match ctx.args.get("mutationType") {
+        //                     Some(mutation_type) => Some(match mutation_type.enum_name()? {
+        //                         "CREATED" => MutationType::Created,
+        //                         "DELETED" => MutationType::Deleted,
+        //                         _ => return Err("Invalid mutation type".into()),
+        //                     }),
+        //                     None => None,
+        //                 };
+        //                 Ok(
+        //                     SimpleBroker::<BookChanged>::subscribe().filter(move |event| {
+        //                         let res = if let Some(mutation_type) = mutation_type {
+        //                             event.mutation_type == mutation_type
+        //                         } else {
+        //                             true
+        //                         };
+        //                         async move { res }
+        //                     }),
+        //                 )
+        //             })
+        //         },
+        //     )
+        //     .argument(InputValue::new(
+        //         "mutationType",
+        //         TypeRef::named(mutation_type.type_name()),
+        //     )),
+        // )
+        .field(SubscriptionField::new(
+            "bookMutation",
+            TypeRef::named_nn(book_changed.type_name()),
+            |_| {
+                SubscriptionFieldFuture::new(async {
+                    Ok(SimpleBroker::<BookChanged>::subscribe()
+                        .map(|book| Ok(FieldValue::owned_any(book))))
                 })
             },
         ));
-
-    let mutatation_root = Object::new("Mutation").field(
-        Field::new("createBook", TypeRef::named(TypeRef::ID), |ctx| {
-            FieldFuture::new(async move {
-                let mut store = ctx.data_unchecked::<Storage>().lock().await;
-                let name = ctx.args.try_get("name")?;
-                let author = ctx.args.try_get("author")?;
-                let entry = store.vacant_entry();
-                let id: ID = entry.key().into();
-                let book = Book {
-                    id: id.clone(),
-                    name: name.string()?.to_string(),
-                    author: author.string()?.to_string(),
-                };
-                entry.insert(book);
-                let book_mutated = BookChanged {
-                    mutation_type: MutationType::Created,
-                    id: id.clone(),
-                };
-                SimpleBroker::publish(book_mutated);
-                Ok(Some(Value::from(id)))
-            })
-        })
-        .argument(InputValue::new("name", TypeRef::named_nn(TypeRef::STRING)))
-        .argument(InputValue::new(
-            "author",
-            TypeRef::named_nn(TypeRef::STRING),
-        )),
-    );
-    let subscription_root = Subscription::new("Subscription").field(SubscriptionField::new(
-        "bookAdded",
-        TypeRef::named_nn(book_changed.type_name()),
-        |_| {
-            SubscriptionFieldFuture::new(async {
-                Ok(SimpleBroker::<BookChanged>::subscribe()
-                    .map(|book| Ok(FieldValue::owned_any(book))))
-            })
-        },
-    ));
 
     Schema::build(
         query_root.type_name(),
