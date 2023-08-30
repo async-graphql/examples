@@ -198,13 +198,23 @@ pub fn schema() -> Result<Schema, SchemaError> {
         .field(SubscriptionField::new(
             "bookMutation",
             TypeRef::named_nn(book_changed.type_name()),
-            |_| {
+            |ctx| {
+                let mutation_type: Result<MutationType, _>  = ctx.args.try_get("mutation_type").unwrap().enum_name().unwrap().parse();
+
+                match mutation_type {
+                    Ok(mutation_type) => match mutation_type {
+                        MutationType::Created => println!("Created"),
+                        MutationType::Deleted => println!("Deleted")
+                    },
+                    Err(err) => println!("Error: {}", err),
+                }
+
                 SubscriptionFieldFuture::new(async {
                     Ok(SimpleBroker::<BookChanged>::subscribe()
                         .map(|book| Ok(FieldValue::owned_any(book))))
                 })
             },
-        ));
+        ).argument(InputValue::new("mutation_type", TypeRef::named(mutation_type.type_name()))));
 
     Schema::build(
         query_root.type_name(),
