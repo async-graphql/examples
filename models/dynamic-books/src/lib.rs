@@ -1,12 +1,11 @@
 mod model;
 mod simple_broker;
-use async_graphql::ID;
+use std::{str::FromStr, sync::Arc};
 
-use std::str::FromStr;
+use async_graphql::ID;
 use futures_util::lock::Mutex;
 pub use model::schema;
 use slab::Slab;
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Book {
