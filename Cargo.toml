@@ -1,10 +1,12 @@
 [workspace]
+resolver = "2"
 members = [
     "models/starwars",
-    "models/dynamic-starwars",
     "models/books",
     "models/files",
     "models/token",
+    "models/dynamic-starwars",
+    "models/dynamic-files",
 
     "poem/opentelemetry-basic",
     "poem/starwars",
@@ -15,6 +17,7 @@ members = [
     "poem/dynamic-schema",
     "poem/dynamic-starwars",
     "poem/dynamic-books",
+    "poem/dynamic-upload",
 
     "actix-web/token-from-header",
     "actix-web/subscription",

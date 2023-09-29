@@ -1,0 +1,9 @@
+[package]
+name = "dynamic-files"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-graphql = { path = "../../.." }
+slab = "0.4.2"
+futures = "0.3.0"

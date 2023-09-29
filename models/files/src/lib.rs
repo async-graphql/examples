@@ -28,7 +28,6 @@ pub struct MutationRoot;
 impl MutationRoot {
     async fn single_upload(&self, ctx: &Context<'_>, file: Upload) -> FileInfo {
         let mut storage = ctx.data_unchecked::<Storage>().lock().await;
-        println!("files count: {}", storage.len());
         let entry = storage.vacant_entry();
         let upload = file.value(ctx).unwrap();
         let info = FileInfo {
