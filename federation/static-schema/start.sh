@@ -3,11 +3,10 @@
 set -eumo pipefail
 
 function cleanup {
-  kill "$PRODUCTS_ROVER_PID"
-  kill "$REVIEWS_ROVER_PID"
-    kill "$ACCOUNTS_PID"
-    kill "$PRODUCTS_PID"
-    kill "$REVIEWS_PID"
+  for pid in "${PRODUCTS_ROVER_PID:-}" "${REVIEWS_ROVER_PID:-}" "${ACCOUNTS_PID:-}" "${PRODUCTS_PID:-}" "${REVIEWS_PID:-}"; do
+    # try kill all registered pids
+    [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && kill "$pid" || echo "Could not kill $pid"
+  done
 }
 trap cleanup EXIT
 
