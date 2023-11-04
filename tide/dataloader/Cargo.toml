@@ -9,7 +9,7 @@ async-graphql = { path = "../../..", features = ["dataloader"] }
 async-graphql-tide = { path = "../../../integrations/tide" }
 tide = "0.16"
 async-std = "1.9.0"
-sqlx = { version = "0.5.5", features = ["sqlite", "runtime-async-std-rustls"] }
+sqlx = { version = "0.7.2", features = ["sqlite", "runtime-async-std-rustls"] }
 async-trait = "0.1.30"
 itertools = "0.9.0"
 
