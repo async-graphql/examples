@@ -3,25 +3,24 @@
 set -eumo pipefail
 
 function cleanup {
-  kill "$PRODUCTS_ROVER_PID"
-  kill "$REVIEWS_ROVER_PID"
-    kill "$ACCOUNTS_PID"
-    kill "$PRODUCTS_PID"
-    kill "$REVIEWS_PID"
+  for pid in "${PRODUCTS_ROVER_PID:-}" "${REVIEWS_ROVER_PID:-}" "${ACCOUNTS_PID:-}" "${PRODUCTS_PID:-}" "${REVIEWS_PID:-}"; do
+    # try kill all registered pids
+    [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && kill "$pid" || echo "Could not kill $pid"
+  done
 }
 trap cleanup EXIT
 
-cargo build --bin dynamic-federation-accounts
-cargo build --bin dynamic-federation-products
-cargo build --bin dynamic-federation-reviews
+cargo build --bin static-federation-accounts
+cargo build --bin static-federation-products
+cargo build --bin static-federation-reviews
 
-cargo run --bin dynamic-federation-accounts &
+cargo run --bin static-federation-accounts &
 ACCOUNTS_PID=$!
 
-cargo run --bin dynamic-federation-products &
+cargo run --bin static-federation-products &
 PRODUCTS_PID=$!
 
-cargo run --bin dynamic-federation-reviews &
+cargo run --bin static-federation-reviews &
 REVIEWS_PID=$!
 
 sleep 3
