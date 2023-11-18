@@ -2,7 +2,8 @@ use async_graphql::{
     extensions::OpenTelemetry, EmptyMutation, EmptySubscription, Object, Result, Schema,
 };
 use async_graphql_poem::GraphQL;
-use opentelemetry::{sdk::trace::TracerProvider, trace::TracerProvider as _};
+use opentelemetry::trace::TracerProvider as _;
+use opentelemetry_sdk::trace::TracerProvider;
 use poem::{listener::TcpListener, post, EndpointExt, Route, Server};
 
 struct QueryRoot;
