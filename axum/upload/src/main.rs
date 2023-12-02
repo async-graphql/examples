@@ -6,8 +6,9 @@ use axum::{
     Router,
 };
 use files::{MutationRoot, QueryRoot, Storage};
-use hyper::{Method, Server};
-use tower_http::cors::{CorsLayer, Origin};
+use hyper::Method;
+use tower_http::cors::{CorsLayer, AllowOrigin};
+use tokio::net::TcpListener;
 
 async fn graphiql() -> impl IntoResponse {
     Html(GraphiQLSource::build().endpoint("/").finish())
@@ -25,12 +26,12 @@ async fn main() {
         .route("/", get(graphiql).post_service(GraphQL::new(schema)))
         .layer(
             CorsLayer::new()
-                .allow_origin(Origin::predicate(|_, _| true))
+                .allow_origin(AllowOrigin::predicate(|_, _| true))
                 .allow_methods(vec![Method::GET, Method::POST]),
         );
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
+    let listener = TcpListener::bind("127.0.0.1:8000").await.unwrap();
+    axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
 }
