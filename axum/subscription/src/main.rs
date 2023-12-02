@@ -3,8 +3,9 @@ use async_graphql_axum::{GraphQL, GraphQLSubscription};
 use axum::{
     response::{self, IntoResponse},
     routing::get,
-    Router, Server,
+    Router
 };
+use tokio::net::TcpListener;
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
 async fn graphiql() -> impl IntoResponse {
@@ -31,8 +32,8 @@ async fn main() {
 
     println!("GraphiQL IDE: http://localhost:8000");
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
+    let listener = TcpListener::bind("127.0.0.1:8000").await.unwrap();
+    axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
 }
