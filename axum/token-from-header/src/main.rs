@@ -8,9 +8,10 @@ use axum::{
     http::header::HeaderMap,
     response::{Html, IntoResponse, Response},
     routing::get,
-    Router, Server,
+    Router,
 };
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
+use tokio::net::TcpListener;
 
 async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(
@@ -61,8 +62,7 @@ async fn main() {
 
     println!("Playground: http://localhost:8000");
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(graphql_location).await?;
+
+    serve(&"127.0.0.1:8000".parse().unwrap(), app.into_make_service()).await?;
 }
