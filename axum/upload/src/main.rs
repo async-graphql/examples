@@ -3,10 +3,11 @@ use async_graphql_axum::GraphQL;
 use axum::{
     response::{Html, IntoResponse},
     routing::get,
-    Router,
+    serve, Router,
 };
 use files::{MutationRoot, QueryRoot, Storage};
 use hyper::{Method, Server};
+use tokio::net::TcpListener;
 use tower_http::cors::{CorsLayer, Origin};
 
 async fn graphiql() -> impl IntoResponse {
@@ -29,8 +30,7 @@ async fn main() {
                 .allow_methods(vec![Method::GET, Method::POST]),
         );
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(graphql_location).await?;
+
+    serve(&"127.0.0.1:8000".parse().unwrap(), app.into_make_service()).await?;
 }

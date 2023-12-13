@@ -7,7 +7,7 @@ edition = "2021"
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-axum = { path = "../../../integrations/axum" }
-axum = "0.6.0"
+axum = "0.7.0"
 files = { path = "../../models/files" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 hyper = "0.14"
