@@ -8,7 +8,7 @@ use axum::{
     http::header::HeaderMap,
     response::{Html, IntoResponse, Response},
     routing::get,
-    Router, Server,
+    Router,
 };
 use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
 
