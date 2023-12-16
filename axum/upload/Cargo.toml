@@ -10,5 +10,4 @@ async-graphql-axum = { path = "../../../integrations/axum" }
 axum = "0.7.0"
 files = { path = "../../models/files" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
-hyper = "0.14"
 tower-http = { version = "0.5.0", features = ["cors"] }

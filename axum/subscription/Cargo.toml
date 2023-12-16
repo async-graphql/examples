@@ -1,5 +1,5 @@
 [package]
-name = "subscription"
+name = "axum-subscription"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,5 +8,4 @@ async-graphql = { path = "../../.." }
 async-graphql-axum = { path = "../../../integrations/axum" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 books = { path = "../../models/books" }
-hyper = "0.14"
 axum = { version = "0.7.0", features = ["ws"] }

@@ -61,8 +61,7 @@ async fn main() {
 
     println!("Playground: http://localhost:8000");
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
+    axum::serve(TcpListener::bind("127.0.0.1:8000").await.unwrap(), app)
         .await
         .unwrap();
 }

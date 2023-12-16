@@ -1,13 +1,14 @@
 use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
 use async_graphql_axum::GraphQL;
 use axum::{
+    http::Method,
     response::{Html, IntoResponse},
     routing::get,
     Router,
 };
 use files::{MutationRoot, QueryRoot, Storage};
-use hyper::{Method, Server};
-use tower_http::cors::{CorsLayer, Origin};
+use tokio::net::TcpListener;
+use tower_http::cors::{AllowOrigin, CorsLayer};
 
 async fn graphiql() -> impl IntoResponse {
     Html(GraphiQLSource::build().endpoint("/").finish())
@@ -25,12 +26,11 @@ async fn main() {
         .route("/", get(graphiql).post_service(GraphQL::new(schema)))
         .layer(
             CorsLayer::new()
-                .allow_origin(Origin::predicate(|_, _| true))
-                .allow_methods(vec![Method::GET, Method::POST]),
+                .allow_origin(AllowOrigin::predicate(|_, _| true))
+                .allow_methods([Method::GET, Method::POST]),
         );
 
-    Server::bind(&"127.0.0.1:8000".parse().unwrap())
-        .serve(app.into_make_service())
+    axum::serve(TcpListener::bind("127.0.0.1:8000").await.unwrap(), app)
         .await
         .unwrap();
 }
