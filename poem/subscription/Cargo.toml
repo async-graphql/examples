@@ -8,4 +8,4 @@ async-graphql = { path = "../../.." }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 books = { path = "../../models/books" }
-poem = { version = "1.3.48", features = ["websocket"] }
+poem = { version = "2.0.0", features = ["websocket"] }
