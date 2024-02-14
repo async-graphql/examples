@@ -8,7 +8,6 @@ edition = "2018"
 async-graphql = { path = "../../..", features = ["dataloader"] }
 async-graphql-tide = { path = "../../../integrations/tide" }
 async-std = "1.9.0"
-async-trait = "0.1.42"
 itertools = "0.10.0"
 sqlx = { version = "0.7.2", features = [
     "runtime-async-std-rustls",

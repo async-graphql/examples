@@ -7,7 +7,6 @@ use async_graphql::{
     Context, EmptyMutation, EmptySubscription, FieldError, Object, Result, Schema, SimpleObject,
 };
 use async_std::task;
-use async_trait::async_trait;
 use sqlx::PgPool;
 use tide::{http::mime, Body, Response, StatusCode};
 
@@ -26,7 +25,6 @@ impl BookLoader {
     }
 }
 
-#[async_trait]
 impl Loader<i32> for BookLoader {
     type Value = Book;
     type Error = FieldError;
