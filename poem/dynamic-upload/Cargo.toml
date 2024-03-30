@@ -8,4 +8,4 @@ async-graphql = { path = "../../..", features = ["dynamic-schema"] }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
 dynamic-files = { path = "../../models/dynamic-files" }
-poem = "2.0.0"
+poem = "3.0.0"

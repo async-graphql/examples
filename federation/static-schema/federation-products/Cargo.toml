@@ -9,4 +9,4 @@ async-graphql = { path = "../../../.." }
 async-graphql-poem = { path = "../../../../integrations/poem" }
 directives = { path = "../directives" }
 tokio = { version = "1.0.2", features = ["macros", "rt-multi-thread"] }
-poem = { version = "2.0.0" }
+poem = { version = "3.0.0" }
