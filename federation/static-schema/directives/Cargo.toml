@@ -6,4 +6,4 @@ edition = "2021"
 
 [dependencies]
 async-graphql = { path = "../../../.." }
-async-trait = "0.1.61"
+async-trait = "0.1.79"

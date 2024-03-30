@@ -6,6 +6,6 @@ edition = "2021"
 [dependencies]
 async-graphql = { path = "../../..", features = ["dynamic-schema"] }
 async-graphql-poem = { path = "../../../integrations/poem" }
-tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
 dynamic-starwars = { path = "../../models/dynamic-starwars" }
-poem = "2.0.0"
+poem = "2.0.1"
