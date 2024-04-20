@@ -7,4 +7,4 @@ edition = "2021"
 async-graphql = { path = "../../..", features = ["dynamic-schema"] }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
-poem = "2.0.1"
+poem = { version = "3.0.0" }

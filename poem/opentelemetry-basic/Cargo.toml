@@ -9,7 +9,7 @@ edition = "2021"
 async-graphql = { path = "../../..", features = ["opentelemetry"] }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
-poem = "2.0.1"
+poem = "3.0.0"
 opentelemetry = { version = "0.22.0" }
 opentelemetry_sdk = { version = "0.22", features = ["rt-tokio"] }
 opentelemetry-stdout = { version = "0.3.0", features = ["trace"] }
