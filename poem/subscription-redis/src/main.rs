@@ -19,7 +19,7 @@ struct MutationRoot;
 impl MutationRoot {
     async fn publish(&self, ctx: &Context<'_>, value: String) -> Result<bool> {
         let client = ctx.data_unchecked::<Client>();
-        let mut conn = client.get_async_connection().await?;
+        let mut conn = client.get_multiplexed_async_connection().await?;
         conn.publish("values", value).await?;
         Ok(true)
     }
@@ -31,7 +31,7 @@ struct SubscriptionRoot;
 impl SubscriptionRoot {
     async fn values(&self, ctx: &Context<'_>) -> Result<impl Stream<Item = String>> {
         let client = ctx.data_unchecked::<Client>();
-        let mut conn = client.get_async_connection().await?.into_pubsub();
+        let mut conn = client.get_async_pubsub().await?;
         conn.subscribe("values").await?;
         Ok(conn
             .into_on_message()
