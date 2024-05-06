@@ -7,6 +7,6 @@ edition = "2021"
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-warp = { path = "../../../integrations/warp" }
-tokio = { version = "1.0.2", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
 warp = "0.3"
 books = { path = "../../models/books" }
