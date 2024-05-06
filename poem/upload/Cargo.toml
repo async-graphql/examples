@@ -7,6 +7,6 @@ edition = "2021"
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-poem = { path = "../../../integrations/poem" }
-poem = { version = "2.0.0", features = ["websocket"] }
+poem = { version = "3.0.0", features = ["websocket"] }
 files = { path = "../../models/files" }
 tokio = { version = "1.8", features = ["macros", "rt-multi-thread"] }
