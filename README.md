@@ -11,6 +11,7 @@ A git submodule that shows example async-graphql projects.
 - [tide] Examples for `tide`
 - [rocket] Examples for `rocket`
 - [axum] Examples for `axum`
+- [loco] Examples for `loco`
 - [federation] Examples for [Apollo Federation](https://www.apollographql.com/docs/federation/)
 
 
