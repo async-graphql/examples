@@ -1,0 +1,25 @@
+[workspace]
+
+[package]
+name = "loco-subscription"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+loco-rs = { version = "0.6.0", default-features = false, features = ["cli"] }
+eyre = "*"
+tokio = { version = "1.33.0", default-features = false }
+async-trait = "0.1.74"
+axum = "0.7.1"
+
+# async-graphql dependencies
+async-graphql = { path = "../../.." }
+async-graphql-axum = { path = "../../../integrations/axum" }
+books = { path = "../../models/books" }
+
+[[bin]]
+name = "starwars-cli"
+path = "src/bin/main.rs"
+required-features = []
