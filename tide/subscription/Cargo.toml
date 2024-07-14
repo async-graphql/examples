@@ -9,4 +9,4 @@ async-graphql = { path = "../../.." }
 async-graphql-tide = { path = "../../../integrations/tide" }
 books = { path = "../../models/books" }
 tide = "0.16"
-async-std = "1.9.0"
+async-std = "1.12.0"

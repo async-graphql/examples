@@ -7,5 +7,5 @@ edition = "2021"
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-actix-web = { path = "../../../integrations/actix-web" }
-actix-web = { version = "4.0.1", default-features = false, features = ["macros"] }
+actix-web = { version = "4.5.1", default-features = false, features = ["macros"] }
 files = { path = "../../models/files" }
