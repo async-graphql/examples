@@ -214,9 +214,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let starwars = ctx.data::<StarWars>()?;
                     let id = ctx.args.try_get("id")?;
-                    Ok(starwars
-                        .human(id.string()?)
-                        .map(|v| FieldValue::borrowed_any(v)))
+                    Ok(starwars.human(id.string()?).map(FieldValue::borrowed_any))
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING))),
@@ -229,7 +227,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
                     let starwars = ctx.data::<StarWars>()?;
                     let humans = starwars.humans();
                     Ok(Some(FieldValue::list(
-                        humans.into_iter().map(|v| FieldValue::borrowed_any(v)),
+                        humans.into_iter().map(FieldValue::borrowed_any),
                     )))
                 })
             },
@@ -239,9 +237,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let starwars = ctx.data::<StarWars>()?;
                     let id = ctx.args.try_get("id")?;
-                    Ok(starwars
-                        .droid(id.string()?)
-                        .map(|v| FieldValue::borrowed_any(v)))
+                    Ok(starwars.droid(id.string()?).map(FieldValue::borrowed_any))
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING))),
@@ -254,7 +250,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
                     let starwars = ctx.data::<StarWars>()?;
                     let droids = starwars.droids();
                     Ok(Some(FieldValue::list(
-                        droids.into_iter().map(|v| FieldValue::borrowed_any(v)),
+                        droids.into_iter().map(FieldValue::borrowed_any),
                     )))
                 })
             },
