@@ -35,12 +35,13 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::resource("/")
                     .guard(guard::Post())
-                    .to(GraphQL::new(schema)),
+                    .to(GraphQL::new(schema.clone())),
             )
             .service(
                 web::resource("/")
                     .guard(guard::Get())
                     .guard(guard::Header("upgrade", "websocket"))
+                    .app_data(web::Data::new(schema))
                     .to(index_ws),
             )
             .service(web::resource("/").guard(guard::Get()).to(index_graphiql))
