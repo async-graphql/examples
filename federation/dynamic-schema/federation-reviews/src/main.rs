@@ -141,7 +141,10 @@ fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let review = ctx.parent_value.try_downcast_ref::<Review>()?;
                     Ok(Some(FieldValue::list(
-                        review.pictures.iter().map(FieldValue::borrowed_any),
+                        review
+                            .pictures
+                            .iter()
+                            .map(|review| FieldValue::borrowed_any(review)),
                     )))
                 })
             },
@@ -198,7 +201,9 @@ fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let reviews = ctx.data::<Vec<Review>>()?;
                     Ok(Some(FieldValue::list(
-                        reviews.iter().map(FieldValue::borrowed_any),
+                        reviews
+                            .iter()
+                            .map(|review| FieldValue::borrowed_any(review)),
                     )))
                 })
             },
@@ -253,7 +258,7 @@ fn schema() -> Result<Schema, SchemaError> {
                         reviews
                             .iter()
                             .filter(|review| review.get_author().id == user.id)
-                            .map(FieldValue::borrowed_any),
+                            .map(|review| FieldValue::borrowed_any(review)),
                     )))
                 })
             },

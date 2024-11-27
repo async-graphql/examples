@@ -90,7 +90,10 @@ fn schema() -> Result<Schema, SchemaError> {
             |ctx| {
                 FieldFuture::new(async move {
                     let user = ctx.parent_value.try_downcast_ref::<User>()?;
-                    Ok(user.profile_picture.as_ref().map(FieldValue::borrowed_any))
+                    Ok(user
+                        .profile_picture
+                        .as_ref()
+                        .map(|pic| FieldValue::borrowed_any(pic)))
                 })
             },
         ))

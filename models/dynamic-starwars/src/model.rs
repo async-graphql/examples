@@ -214,7 +214,9 @@ pub fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let starwars = ctx.data::<StarWars>()?;
                     let id = ctx.args.try_get("id")?;
-                    Ok(starwars.human(id.string()?).map(FieldValue::borrowed_any))
+                    Ok(starwars
+                        .human(id.string()?)
+                        .map(|human| FieldValue::borrowed_any(human)))
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING))),
@@ -227,7 +229,9 @@ pub fn schema() -> Result<Schema, SchemaError> {
                     let starwars = ctx.data::<StarWars>()?;
                     let humans = starwars.humans();
                     Ok(Some(FieldValue::list(
-                        humans.into_iter().map(FieldValue::borrowed_any),
+                        humans
+                            .into_iter()
+                            .map(|human| FieldValue::borrowed_any(human)),
                     )))
                 })
             },
@@ -237,7 +241,9 @@ pub fn schema() -> Result<Schema, SchemaError> {
                 FieldFuture::new(async move {
                     let starwars = ctx.data::<StarWars>()?;
                     let id = ctx.args.try_get("id")?;
-                    Ok(starwars.droid(id.string()?).map(FieldValue::borrowed_any))
+                    Ok(starwars
+                        .droid(id.string()?)
+                        .map(|droid| FieldValue::borrowed_any(droid)))
                 })
             })
             .argument(InputValue::new("id", TypeRef::named_nn(TypeRef::STRING))),
@@ -250,7 +256,9 @@ pub fn schema() -> Result<Schema, SchemaError> {
                     let starwars = ctx.data::<StarWars>()?;
                     let droids = starwars.droids();
                     Ok(Some(FieldValue::list(
-                        droids.into_iter().map(FieldValue::borrowed_any),
+                        droids
+                            .into_iter()
+                            .map(|droid| FieldValue::borrowed_any(droid)),
                     )))
                 })
             },

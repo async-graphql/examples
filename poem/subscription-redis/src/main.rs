@@ -20,7 +20,7 @@ impl MutationRoot {
     async fn publish(&self, ctx: &Context<'_>, value: String) -> Result<bool> {
         let client = ctx.data_unchecked::<Client>();
         let mut conn = client.get_multiplexed_async_connection().await?;
-        conn.publish("values", value).await?;
+        conn.publish::<_, _, ()>("values", value).await?;
         Ok(true)
     }
 }
