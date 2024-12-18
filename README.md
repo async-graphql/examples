@@ -25,6 +25,7 @@ git clone async-graphql/async-graphql
 cargo build
 
 # update this repo as a git submodule
+git submodule init
 git submodule update
 ```
 
