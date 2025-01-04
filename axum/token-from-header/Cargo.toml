@@ -8,4 +8,4 @@ async-graphql = { path = "../../.." }
 async-graphql-axum = { path = "../../../integrations/axum" }
 tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
 token = { path = "../../models/token" }
-axum = { version = "0.7.5", features = ["ws"] }
+axum = { version = "0.8.1", features = ["ws"] }
