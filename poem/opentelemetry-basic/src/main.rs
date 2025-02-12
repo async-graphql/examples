@@ -2,8 +2,8 @@ use async_graphql::{
     extensions::OpenTelemetry, EmptyMutation, EmptySubscription, Object, Result, Schema,
 };
 use async_graphql_poem::GraphQL;
-use opentelemetry::trace::TracerProvider as _;
-use opentelemetry_sdk::trace::TracerProvider;
+use opentelemetry::trace::TracerProvider;
+use opentelemetry_sdk::trace::SdkTracerProvider;
 use poem::{listener::TcpListener, post, EndpointExt, Route, Server};
 
 struct QueryRoot;
@@ -17,7 +17,7 @@ impl QueryRoot {
 
 #[tokio::main]
 async fn main() {
-    let provider = TracerProvider::builder()
+    let provider = SdkTracerProvider::builder()
         .with_simple_exporter(opentelemetry_stdout::SpanExporter::default())
         .build();
     let tracer = provider.tracer("poem-opentelemetry-basic");
@@ -43,4 +43,6 @@ async fn main() {
         .run(app)
         .await
         .unwrap();
+
+    provider.shutdown().unwrap();
 }
