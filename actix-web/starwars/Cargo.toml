@@ -2,10 +2,12 @@
 name = "actix-web-starwars"
 version = "0.1.1"
 authors = ["sunli <scott_s829@163.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 async-graphql = { path = "../../.." }
 async-graphql-actix-web = { path = "../../../integrations/actix-web" }
-actix-web = { version = "4.5.1", default-features = false, features = ["macros"] }
+actix-web = { version = "4.5.1", default-features = false, features = [
+    "macros",
+] }
 starwars = { path = "../../models/starwars" }

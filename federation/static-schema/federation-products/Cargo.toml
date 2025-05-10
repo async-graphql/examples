@@ -2,7 +2,7 @@
 name = "static-federation-products"
 version = "0.2.0"
 authors = ["sunli <scott_s829@163.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 async-graphql = { path = "../../../.." }

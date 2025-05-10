@@ -2,7 +2,7 @@
 name = "axum-upload"
 version = "0.1.1"
 authors = ["sunli <scott_s829@163.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 async-graphql = { path = "../../.." }
