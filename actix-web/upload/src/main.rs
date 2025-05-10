@@ -1,7 +1,7 @@
-use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer, guard, web, web::Data};
 use async_graphql::{
-    http::{GraphiQLSource, MultipartOptions},
     EmptySubscription, Schema,
+    http::{GraphiQLSource, MultipartOptions},
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};

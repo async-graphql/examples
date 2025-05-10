@@ -1,5 +1,5 @@
-use actix_web::{guard, web, App, HttpResponse, HttpServer, Result};
-use async_graphql::{http::GraphiQLSource, EmptyMutation, EmptySubscription, Schema};
+use actix_web::{App, HttpResponse, HttpServer, Result, guard, web};
+use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_actix_web::GraphQL;
 use starwars::{QueryRoot, StarWars};
 

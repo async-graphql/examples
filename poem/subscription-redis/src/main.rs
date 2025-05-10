@@ -1,7 +1,7 @@
-use async_graphql::{http::GraphiQLSource, Context, Object, Result, Schema, Subscription};
+use async_graphql::{Context, Object, Result, Schema, Subscription, http::GraphiQLSource};
 use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use futures_util::{Stream, StreamExt};
-use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
+use poem::{IntoResponse, Route, Server, get, handler, listener::TcpListener, web::Html};
 use redis::{AsyncCommands, Client};
 
 struct QueryRoot;

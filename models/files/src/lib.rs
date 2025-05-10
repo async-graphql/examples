@@ -1,4 +1,4 @@
-use async_graphql::{Context, EmptySubscription, Object, Schema, SimpleObject, Upload, ID};
+use async_graphql::{Context, EmptySubscription, ID, Object, Schema, SimpleObject, Upload};
 use futures::lock::Mutex;
 use slab::Slab;
 

@@ -1,4 +1,4 @@
-use async_graphql::{dynamic::*, Value};
+use async_graphql::{Value, dynamic::*};
 
 use crate::{Episode, StarWars, StarWarsChar};
 

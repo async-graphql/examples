@@ -1,12 +1,12 @@
 use std::error::Error;
 
 use async_graphql::{
-    dynamic::*,
-    http::{playground_source, GraphQLPlaygroundConfig},
     Value,
+    dynamic::*,
+    http::{GraphQLPlaygroundConfig, playground_source},
 };
 use async_graphql_poem::GraphQL;
-use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
+use poem::{IntoResponse, Route, Server, get, handler, listener::TcpListener, web::Html};
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {

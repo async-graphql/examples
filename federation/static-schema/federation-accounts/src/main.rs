@@ -1,6 +1,6 @@
-use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
+use async_graphql::{EmptyMutation, EmptySubscription, ID, Object, Schema, SimpleObject};
 use async_graphql_poem::GraphQL;
-use poem::{listener::TcpListener, Route, Server};
+use poem::{Route, Server, listener::TcpListener};
 
 #[derive(SimpleObject)]
 struct User {

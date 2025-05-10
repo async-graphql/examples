@@ -1,9 +1,9 @@
 use std::convert::Infallible;
 
-use async_graphql::{http::GraphiQLSource, Schema};
-use async_graphql_warp::{graphql_subscription, GraphQLResponse};
+use async_graphql::{Schema, http::GraphiQLSource};
+use async_graphql_warp::{GraphQLResponse, graphql_subscription};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use warp::{http::Response as HttpResponse, Filter};
+use warp::{Filter, http::Response as HttpResponse};
 
 #[tokio::main]
 async fn main() {

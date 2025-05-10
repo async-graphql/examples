@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate thiserror;
 
-use actix_web::{guard, web, App, HttpResponse, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer, guard, web};
 use async_graphql::{
-    http::GraphiQLSource, EmptyMutation, EmptySubscription, ErrorExtensions, FieldError,
-    FieldResult, Object, ResultExt, Schema,
+    EmptyMutation, EmptySubscription, ErrorExtensions, FieldError, FieldResult, Object, ResultExt,
+    Schema, http::GraphiQLSource,
 };
 use async_graphql_actix_web::GraphQL;
 

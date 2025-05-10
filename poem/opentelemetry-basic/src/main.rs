@@ -1,10 +1,10 @@
 use async_graphql::{
-    extensions::OpenTelemetry, EmptyMutation, EmptySubscription, Object, Result, Schema,
+    EmptyMutation, EmptySubscription, Object, Result, Schema, extensions::OpenTelemetry,
 };
 use async_graphql_poem::GraphQL;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::trace::TracerProvider;
-use poem::{listener::TcpListener, post, EndpointExt, Route, Server};
+use poem::{EndpointExt, Route, Server, listener::TcpListener, post};
 
 struct QueryRoot;
 
@@ -37,7 +37,9 @@ async fn main() {
     -H 'content-type: application/json' \
     --data '{ \"query\": \"{ hello }\" }'";
 
-    println!("Run this curl command from another terminal window to see opentelemetry output in this terminal.\n\n{example_curl}\n\n");
+    println!(
+        "Run this curl command from another terminal window to see opentelemetry output in this terminal.\n\n{example_curl}\n\n"
+    );
 
     Server::new(TcpListener::bind("127.0.0.1:8000"))
         .run(app)

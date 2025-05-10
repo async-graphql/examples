@@ -1,9 +1,9 @@
-use async_graphql::{http::GraphiQLSource, Schema};
+use async_graphql::{Schema, http::GraphiQLSource};
 use async_graphql_axum::{GraphQL, GraphQLSubscription};
 use axum::{
+    Router,
     response::{self, IntoResponse},
     routing::get,
-    Router,
 };
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 use tokio::net::TcpListener;

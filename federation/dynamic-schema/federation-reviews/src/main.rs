@@ -2,7 +2,7 @@ use async_graphql::dynamic::{
     Enum, Field, FieldFuture, FieldValue, Object, Schema, SchemaError, TypeRef,
 };
 use async_graphql_poem::GraphQL;
-use poem::{listener::TcpListener, Route, Server};
+use poem::{Route, Server, listener::TcpListener};
 
 struct Picture {
     url: String,

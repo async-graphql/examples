@@ -1,5 +1,5 @@
-use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
-use async_graphql::{http::GraphiQLSource, Schema};
+use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Result, guard, web};
+use async_graphql::{Schema, http::GraphiQLSource};
 use async_graphql_actix_web::{GraphQL, GraphQLSubscription};
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 

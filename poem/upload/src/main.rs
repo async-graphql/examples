@@ -1,12 +1,11 @@
-use async_graphql::{http::GraphiQLSource, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
 use files::{FilesSchema, MutationRoot, QueryRoot, Storage};
 use poem::{
-    get, handler,
+    EndpointExt, IntoResponse, Route, Server, get, handler,
     listener::TcpListener,
     middleware::Cors,
     web::{Data, Html},
-    EndpointExt, IntoResponse, Route, Server,
 };
 
 #[handler]

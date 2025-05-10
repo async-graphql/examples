@@ -1,9 +1,9 @@
 use async_graphql::{
-    ComplexObject, Context, EmptyMutation, EmptySubscription, Enum, Object, Schema, SimpleObject,
-    ID,
+    ComplexObject, Context, EmptyMutation, EmptySubscription, Enum, ID, Object, Schema,
+    SimpleObject,
 };
 use async_graphql_poem::GraphQL;
-use poem::{listener::TcpListener, Route, Server};
+use poem::{Route, Server, listener::TcpListener};
 
 #[derive(SimpleObject)]
 #[graphql(complex)]

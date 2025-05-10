@@ -1,7 +1,7 @@
-use async_graphql::{dynamic::*, Value, ID};
+use async_graphql::{ID, Value, dynamic::*};
 use futures_util::StreamExt;
 
-use crate::{simple_broker::SimpleBroker, Book, BookChanged, MutationType, Storage};
+use crate::{Book, BookChanged, MutationType, Storage, simple_broker::SimpleBroker};
 
 impl<'a> From<MutationType> for FieldValue<'a> {
     fn from(value: MutationType) -> Self {

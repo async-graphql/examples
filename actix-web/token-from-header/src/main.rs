@@ -1,9 +1,9 @@
 use actix_web::{
-    guard, http::header::HeaderMap, web, App, HttpRequest, HttpResponse, HttpServer, Result,
+    App, HttpRequest, HttpResponse, HttpServer, Result, guard, http::header::HeaderMap, web,
 };
-use async_graphql::{http::GraphiQLSource, EmptyMutation, Schema};
+use async_graphql::{EmptyMutation, Schema, http::GraphiQLSource};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse, GraphQLSubscription};
-use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
+use token::{QueryRoot, SubscriptionRoot, Token, TokenSchema, on_connection_init};
 
 async fn graphiql() -> HttpResponse {
     HttpResponse::Ok()

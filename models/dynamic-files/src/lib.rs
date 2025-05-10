@@ -1,6 +1,6 @@
 use async_graphql::{
-    dynamic::{Field, FieldFuture, FieldValue, InputValue, Object, Schema, SchemaError, TypeRef},
     Value,
+    dynamic::{Field, FieldFuture, FieldValue, InputValue, Object, Schema, SchemaError, TypeRef},
 };
 use futures::lock::Mutex;
 use slab::Slab;

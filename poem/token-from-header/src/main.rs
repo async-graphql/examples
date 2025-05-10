@@ -1,16 +1,15 @@
 use async_graphql::{
-    http::{GraphiQLSource, ALL_WEBSOCKET_PROTOCOLS},
     EmptyMutation, Schema,
+    http::{ALL_WEBSOCKET_PROTOCOLS, GraphiQLSource},
 };
 use async_graphql_poem::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
 use poem::{
-    get, handler,
+    EndpointExt, IntoResponse, Route, Server, get, handler,
     http::HeaderMap,
     listener::TcpListener,
-    web::{websocket::WebSocket, Data, Html},
-    EndpointExt, IntoResponse, Route, Server,
+    web::{Data, Html, websocket::WebSocket},
 };
-use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
+use token::{QueryRoot, SubscriptionRoot, Token, TokenSchema, on_connection_init};
 
 fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
     headers

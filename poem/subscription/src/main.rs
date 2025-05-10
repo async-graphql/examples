@@ -1,7 +1,7 @@
-use async_graphql::{http::GraphiQLSource, Schema};
+use async_graphql::{Schema, http::GraphiQLSource};
 use async_graphql_poem::{GraphQL, GraphQLSubscription};
 use books::{MutationRoot, QueryRoot, Storage, SubscriptionRoot};
-use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
+use poem::{IntoResponse, Route, Server, get, handler, listener::TcpListener, web::Html};
 
 #[handler]
 async fn graphiql() -> impl IntoResponse {

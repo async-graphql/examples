@@ -1,16 +1,16 @@
 use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig, ALL_WEBSOCKET_PROTOCOLS},
     EmptyMutation, Schema,
+    http::{ALL_WEBSOCKET_PROTOCOLS, GraphQLPlaygroundConfig, playground_source},
 };
 use async_graphql_axum::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
 use axum::{
-    extract::{ws::WebSocketUpgrade, State},
+    Router,
+    extract::{State, ws::WebSocketUpgrade},
     http::header::HeaderMap,
     response::{Html, IntoResponse, Response},
     routing::get,
-    Router,
 };
-use token::{on_connection_init, QueryRoot, SubscriptionRoot, Token, TokenSchema};
+use token::{QueryRoot, SubscriptionRoot, Token, TokenSchema, on_connection_init};
 use tokio::net::TcpListener;
 
 async fn graphql_playground() -> impl IntoResponse {
