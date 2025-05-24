@@ -170,7 +170,7 @@ pub fn schema() -> Result<Schema, SchemaError> {
             .description("The primary function of the droid."),
         );
 
-    let query = Object::new("Qurey")
+    let query = Object::new("Query")
         .field(
             Field::new("hero", TypeRef::named_nn(character.type_name()), |ctx| {
                 FieldFuture::new(async move {
