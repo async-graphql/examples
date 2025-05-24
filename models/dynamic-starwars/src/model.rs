@@ -2,7 +2,7 @@ use async_graphql::{Value, dynamic::*};
 
 use crate::{Episode, StarWars, StarWarsChar};
 
-impl<'a> From<Episode> for FieldValue<'a> {
+impl From<Episode> for FieldValue<'_> {
     fn from(value: Episode) -> Self {
         match value {
             Episode::NewHope => FieldValue::value("NEW_HOPE"),

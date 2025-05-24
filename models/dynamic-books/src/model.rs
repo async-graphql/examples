@@ -3,7 +3,7 @@ use futures_util::StreamExt;
 
 use crate::{Book, BookChanged, MutationType, Storage, simple_broker::SimpleBroker};
 
-impl<'a> From<MutationType> for FieldValue<'a> {
+impl From<MutationType> for FieldValue<'_> {
     fn from(value: MutationType) -> Self {
         match value {
             MutationType::Created => FieldValue::value("CREATED"),
