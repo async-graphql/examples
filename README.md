@@ -8,7 +8,6 @@ A git submodule that shows example async-graphql projects.
 - [poem] Examples for `poem`
 - [actix-web] Examples for `actix-web`
 - [warp] Examples for `warp`
-- [tide] Examples for `tide`
 - [rocket] Examples for `rocket`
 - [axum] Examples for `axum`
 - [loco] Examples for `loco`
