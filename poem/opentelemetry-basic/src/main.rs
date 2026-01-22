@@ -1,6 +1,4 @@
-use async_graphql::{
-    EmptyMutation, EmptySubscription, Object, Result, Schema, 
-};
+use async_graphql::{EmptyMutation, EmptySubscription, Object, Result, Schema};
 use async_graphql_extras::extensions::OpenTelemetry;
 use async_graphql_poem::GraphQL;
 use opentelemetry::trace::TracerProvider as _;
