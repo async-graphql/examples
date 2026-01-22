@@ -1,6 +1,6 @@
 use async_graphql::{
     EmptyMutation, Schema,
-    http::{ALL_WEBSOCKET_PROTOCOLS, GraphQLPlaygroundConfig, playground_source},
+    http::{ALL_WEBSOCKET_PROTOCOLS, GraphiQLSource},
 };
 use async_graphql_axum::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
 use axum::{
@@ -14,9 +14,12 @@ use token::{QueryRoot, SubscriptionRoot, Token, TokenSchema, on_connection_init}
 use tokio::net::TcpListener;
 
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(
-        GraphQLPlaygroundConfig::new("/").subscription_endpoint("/ws"),
-    ))
+    Html(
+        GraphiQLSource::build()
+            .endpoint("/")
+            .subscription_endpoint("/ws")
+            .finish(),
+    )
 }
 
 fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {

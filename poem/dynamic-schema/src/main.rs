@@ -1,16 +1,12 @@
 use std::error::Error;
 
-use async_graphql::{
-    Value,
-    dynamic::*,
-    http::{GraphQLPlaygroundConfig, playground_source},
-};
+use async_graphql::{Value, dynamic::*, http::GraphiQLSource};
 use async_graphql_poem::GraphQL;
 use poem::{IntoResponse, Route, Server, get, handler, listener::TcpListener, web::Html};
 
 #[handler]
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/")))
+    Html(GraphiQLSource::build().endpoint("/").finish())
 }
 
 #[tokio::main]
