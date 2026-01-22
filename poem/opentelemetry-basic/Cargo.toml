@@ -6,7 +6,8 @@ edition = "2024"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-graphql = { path = "../../..", features = ["opentelemetry"] }
+async-graphql = { path = "../../.." }
+async-graphql-extras = { path = "../../../extras", features = ["opentelemetry"] }
 async-graphql-poem = { path = "../../../integrations/poem" }
 tokio = { version = "1.37", features = ["macros", "rt-multi-thread"] }
 poem = "3.0.0"
